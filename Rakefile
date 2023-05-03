@@ -20,8 +20,8 @@ MODULES = %w[core]
 end
 
 YARD::Rake::YardocTask.new do |t|
-  t.files   = ["{#{MODULES.join(',')}}/lib/**/*.rb"]
-  t.options = ['--protected', '--readme', 'README.md', '--title', 'Testcontainers for Ruby']
+  t.files = ["{#{MODULES.join(",")}}/lib/**/*.rb"]
+  t.options = ["--protected", "--readme", "README.md", "--title", "Testcontainers for Ruby"]
 end
 
 task default: %i[test standard]
