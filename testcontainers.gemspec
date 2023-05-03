@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   # For docs
   spec.add_development_dependency "yard", "~> 0.9"
   spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "standard", "~> 1.3"
 end
