@@ -167,7 +167,7 @@ class DockerContainerTest < TestcontainersTest
     assert_equal("foobar", container.name)
     assert_equal(%w[tail -f /dev/null], container.command)
     assert_equal({"80/tcp" => {}, "443/tcp" => {}}, container.exposed_ports)
-    assert_equal({"80/tcp" => [{"HostPort" => "8080"}]}, container.port_bindings)
+    assert_equal({"80/tcp" => [{"HostPort" => "8080"}], "443/tcp" => [{"HostPort" => ""}]}, container.port_bindings)
     assert_equal({"/tmp" => {}, "/root" => {}}, container.volumes)
     assert_equal(["/tmp/docker:/tmp:rw", "/home/user:/root:rw"], container.filesystem_binds)
     assert_equal({"foo" => "bar"}, container.labels)
