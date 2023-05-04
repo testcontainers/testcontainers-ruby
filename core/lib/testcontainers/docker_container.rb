@@ -75,7 +75,9 @@ module Testcontainers
     def add_exposed_port(port)
       port = normalize_port(port)
       @exposed_ports ||= {}
+      @port_bindings ||= {}
       @exposed_ports[port] = {}
+      @port_bindings[port] = [{"HostPort" => ""}]
       @exposed_ports
     end
 
