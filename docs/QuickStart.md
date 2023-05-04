@@ -70,4 +70,4 @@ end
 
 With these changes, your test suite will automatically start a new Redis container for each test, ensuring a clean and isolated environment. The container will be stopped after each test is completed.
 
-You can re-use containers between tests (e.g using after(:all) / before(:all) blocks in RSpec). Take a look to file examples/redis_backed_cache.rb for the full example with tests.
+You can re-use containers between tests (e.g using after(:all) / before(:all) blocks in RSpec). Take a look to file [examples/redis_backed_cache.rb](https://github.com/guilleiguaran/testcontainers-ruby/blob/main/examples/redis_backed_cache.rb) for the full example with tests.
