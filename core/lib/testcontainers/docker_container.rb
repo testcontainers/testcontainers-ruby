@@ -40,12 +40,12 @@ module Testcontainers
       @image = image
       @command = command
       @name = name
-      @exposed_ports = normalize_ports(exposed_ports)
-      @port_bindings = normalize_port_bindings(port_bindings)
-      @volumes = normalize_volumes(volumes)
-      @env = process_env_input(env)
-      @filesystem_binds = normalize_filesystem_binds(filesystem_binds)
-      @labels = labels
+      @exposed_ports = add_exposed_ports(exposed_ports) if exposed_ports
+      @port_bindings = add_fixed_exposed_ports(port_bindings) if port_bindings
+      @volumes = add_volumes(volumes) if volumes
+      @env = add_env(env) if env
+      @filesystem_binds = add_filesystem_binds(filesystem_binds) if filesystem_binds
+      @labels = add_labels(labels) if labels
       @working_dir = working_dir
       @logger = logger
       @_container = nil
@@ -110,6 +110,17 @@ module Testcontainers
       @port_bindings ||= {}
       @exposed_ports[container_port] = {}
       @port_bindings[container_port] = [{"HostPort" => host_port.to_s}]
+      @port_bindings
+    end
+
+    # Add multiple fixed exposed ports to the container configuration.
+    #
+    # @param port_mappings [Hash] The list of container ports and host ports to bind them to.
+    # @return [Hash] The updated list of port bindings.
+    def add_fixed_exposed_ports(port_mappings = {})
+      port_mappings.each do |container_port, host_port|
+        add_fixed_exposed_port(container_port, host_port)
+      end
       @port_bindings
     end
 
