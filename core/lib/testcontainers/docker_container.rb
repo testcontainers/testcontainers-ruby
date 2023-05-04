@@ -392,6 +392,7 @@ module Testcontainers
     def remove
       @_container&.remove
       @_container = nil
+      self
     rescue Excon::Error::Socket => e
       raise ConnectionError, e.message
     end
@@ -554,7 +555,7 @@ module Testcontainers
     # Returns the mapped host port for the given container port.
     #
     # @param port [Integer] The container port.
-    # @return [Integer] The mapped host port.
+    # @return [String] The mapped host port.
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [ContainerNotStartedError] If the container has not been started.
     def mapped_port(port)
@@ -583,7 +584,7 @@ module Testcontainers
     # Executes a command in the container.
     # See https://docs.docker.com/engine/api/v1.42/#operation/ContainerExec
     #
-    # @param command [Array<String>] The command to execute.
+    # @param cmd [Array<String>] The command to execute.
     # @param tty [Boolean] Allocate a pseudo-TTY.
     # @param detach [Boolean] Detach from the command.
     # @param user [String] The user to execute the command as.
@@ -592,7 +593,7 @@ module Testcontainers
     # @param stderr [Boolean] Attach to stderr of the exec command.
     # @param wait [Integer] The number of seconds to wait for the command to finish.
     # @param options [Hash] Additional options to pass to the Docker API. (e.g `Env`)
-    def exec(command, tty: false, detach: false, user: nil, stdin: nil, stdout: nil, stderr: nil, wait: nil, **options, &block)
+    def exec(cmd, tty: false, detach: false, user: nil, stdin: nil, stdout: nil, stderr: nil, wait: nil, **options, &block)
       raise ContainerNotStartedError unless @_container
       stdout ||= !detach
       stderr ||= !detach
