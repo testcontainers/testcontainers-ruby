@@ -189,6 +189,7 @@ class DockerContainerTest < TestcontainersTest
 
   def test_it_returns_the_container_status
     @container.start
+    @container.wait_for_logs(/Hello from Docker!/)
     assert_equal "exited", @container.status
 
     @long_running_container.start
