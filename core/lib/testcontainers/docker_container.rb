@@ -609,32 +609,19 @@ module Testcontainers
     end
 
     # Executes a command in the container.
-    # See https://docs.docker.com/engine/api/v1.42/#operation/ContainerExec
+    # See https://docs.docker.com/engine/api/v1.42/#operation/ContainerExec for all available options.
     #
     # @param cmd [Array<String>] The command to execute.
-    # @param tty [Boolean] Allocate a pseudo-TTY.
-    # @param detach [Boolean] Detach from the command.
-    # @param user [String] The user to execute the command as.
-    # @param stdin [String] Attach to stdin of the exec command.
-    # @param stdout [Boolean] Attach to stdout of the exec command.
-    # @param stderr [Boolean] Attach to stderr of the exec command.
-    # @param wait [Integer] The number of seconds to wait for the command to finish.
-    # @param options [Hash] Additional options to pass to the Docker API. (e.g `Env`)
-    def exec(cmd, tty: false, detach: false, user: nil, stdin: nil, stdout: nil, stderr: nil, wait: nil, **options, &block)
+    # @param options [Hash] Additional options to pass to the Docker Exec API. (e.g `Env`)
+    # @option options [Boolean] :tty Allocate a pseudo-TTY.
+    # @option options [Boolean] :detach (false) Whether to attach to STDOUT/STDERR.
+    # @option options [Object] :stdin Attach to stdin of the exec command.
+    # @option options [Integer] :wait The number of seconds to wait for the command to finish.
+    # @option options [String] :user The user to execute the command as.
+    # @return [Array, Array, Integer] The STDOUT, STDERR and exit code.
+    def exec(cmd, options = {}, &block)
       raise ContainerNotStartedError unless @_container
-      stdout ||= !detach
-      stderr ||= !detach
-      @_container.exec(
-        command,
-        tty: tty,
-        detach: detach,
-        user: user,
-        stdin: stdin,
-        stdout: stdout,
-        stderr: stderr,
-        wait: wait,
-        **options, &block
-      )
+      @_container.exec(cmd, options, &block)
     rescue Excon::Error::Socket => e
       raise ConnectionError, e.message
     end
