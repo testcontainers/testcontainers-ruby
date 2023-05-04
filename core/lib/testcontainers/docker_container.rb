@@ -546,9 +546,15 @@ module Testcontainers
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [ContainerNotStartedError] If the container has not been started.
     def host
+      host = docker_host
+      return "localhost" if host.nil?
       raise ContainerNotStartedError unless @_container
-      host = info["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
-      return "localhost" if host.nil? || host.empty?
+
+      if inside_container? && ENV["DOCKER_HOST"].nil?
+        gateway_ip = container_gateway_ip
+        return bridge_ip if gateway_ip == host
+        return gateway_ip
+      end
       host
     rescue Excon::Error::Socket => e
       raise ConnectionError, e.message
@@ -562,7 +568,15 @@ module Testcontainers
     # @raise [ContainerNotStartedError] If the container has not been started.
     def mapped_port(port)
       raise ContainerNotStartedError unless @_container
-      info["NetworkSettings"]["Ports"][normalize_port(port)].first["HostPort"]
+      mapped_port = container_port(port)
+
+      if inside_container?
+        gateway_ip = container_gateway_ip
+        host = docker_host
+
+        return port if gateway_ip == host
+      end
+      mapped_port
     rescue Excon::Error::Socket => e
       raise ConnectionError, e.message
     end
@@ -679,7 +693,7 @@ module Testcontainers
       Timeout.timeout(timeout) do
         loop do
           Timeout.timeout(interval) do
-            TCPSocket.new("localhost", mapped_port(port)).close
+            TCPSocket.new(host, mapped_port(port)).close
             return true
           end
         rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Timeout::Error
@@ -709,7 +723,7 @@ module Testcontainers
       Timeout.timeout(timeout) do
         loop do
           begin
-            response = Excon.get("#{https ? "https" : "http"}://localhost:#{mapped_port(container_port)}#{path}")
+            response = Excon.get("#{https ? "https" : "http"}://#{host}:#{mapped_port(container_port)}#{path}")
             return true if response.status == status
           rescue Excon::Error::Socket
             # The container may not be ready to accept connections yet
@@ -720,6 +734,13 @@ module Testcontainers
       end
     rescue Timeout::Error
       raise TimeoutError, "Timed out waiting for HTTP status #{status} on #{path}"
+    end
+
+    # Returns whether this is running inside a container.
+    #
+    # @return [Boolean] Whether this is running inside a container.
+    def inside_container?
+      File.exist?("/.dockerenv")
     end
 
     private
@@ -797,6 +818,46 @@ module Testcontainers
       else
         raise ArgumentError, "Invalid input format for process_env_input"
       end
+    end
+
+    def container_bridge_ip
+      @_container&.json&.dig("NetworkSettings", "Networks", "bridge", "IPAddress")
+    end
+
+    def container_gateway_ip
+      @_container&.json&.dig("NetworkSettings", "Networks", "bridge", "Gateway")
+    end
+
+    def container_port(port)
+      @_container&.json&.dig("NetworkSettings", "Ports", normalize_port(port))&.first&.dig("HostPort")
+    end
+
+    def default_gateway_ip
+      cmd = "ip route | awk '/default/ { print $3 }'"
+
+      ip_address, _stderr, status = Open3.capture3(cmd)
+      return ip_address.strip if ip_address && status.success?
+    rescue
+      nil
+    end
+
+    def docker_host
+      return ENV["TC_HOST"] if ENV["TC_HOST"]
+      url = URI.parse(Docker.url)
+
+      case url.scheme
+      when "http", "tcp"
+        url.host
+      when "unix", "npipe"
+        if inside_container?
+          ip_address = default_gateway_ip
+          return ip_address if ip_address
+        end
+      else
+        "localhost"
+      end
+    rescue URI::InvalidURIError
+      nil
     end
 
     def _container_create_options

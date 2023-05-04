@@ -2,6 +2,8 @@
 
 require "docker"
 require "logger"
+require "open3"
+require "uri"
 require "testcontainers/docker_container"
 require_relative "testcontainers/version"
 
