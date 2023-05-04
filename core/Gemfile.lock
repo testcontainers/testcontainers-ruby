@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    testcontainers-core (0.1.0)
+    testcontainers-core (0.1.1)
       docker-api (~> 2.2)
 
 GEM
