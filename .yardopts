@@ -1,0 +1,5 @@
+--readme README.md
+--title 'Testcontainers for Ruby'
+--charset utf-8
+--markup markdown
+core/lib/**/*.rb
