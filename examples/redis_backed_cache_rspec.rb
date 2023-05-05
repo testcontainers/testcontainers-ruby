@@ -28,19 +28,22 @@ end
 require "rspec/autorun"
 
 RSpec.configure do |config|
+  config.add_setting :redis, default: nil
+
   config.before(:suite) do
-    $redis_container = Testcontainers::DockerContainer.new("redis:6.2-alpine").with_exposed_ports(6379).start
-    $redis_container.wait_for_tcp_port(6379) # wait for Redis to start
+    config.redis = Testcontainers::DockerContainer.new("redis:6.2-alpine").with_exposed_ports("6379")
+    config.redis.start
+    config.redis.wait_for_tcp_port("6379") # wait for Redis to start
   end
 
   config.after(:suite) do
-    $redis_container&.stop if $redis_container&.running?
-    $redis_container&.remove
+    config.redis&.stop if config.redis&.running?
+    config.redis&.remove
   end
 end
 
 RSpec.describe RedisBackedCache do
-  let(:cache) { RedisBackedCache.new($redis_container.host, $redis_container.mapped_port(6379)) }
+  let(:cache) { RedisBackedCache.new(RSpec.configuration.redis.host, RSpec.configuration.redis.mapped_port(6379)) }
 
   before { cache.clear }
 
