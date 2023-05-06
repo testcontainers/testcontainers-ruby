@@ -573,8 +573,8 @@ module Testcontainers
 
     # Returns the mapped host port for the given container port.
     #
-    # @param port [Integer] The container port.
-    # @return [String] The mapped host port.
+    # @param port [Integer | String] The container port.
+    # @return [Integer] The mapped host port.
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [ContainerNotStartedError] If the container has not been started.
     def mapped_port(port)
@@ -585,11 +585,20 @@ module Testcontainers
         gateway_ip = container_gateway_ip
         host = docker_host
 
-        return port if gateway_ip == host
+        return port.to_i if gateway_ip == host
       end
-      mapped_port
+      mapped_port.to_i
     rescue Excon::Error::Socket => e
       raise ConnectionError, e.message
+    end
+
+    # Returns the container's first mapped port.
+    #
+    # @return [String] The container's first mapped port.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    def first_mapped_port
+      raise ContainerNotStartedError unless @_container
+      container_ports.map { |port| mapped_port(port) }.first
     end
 
     # Returns the container's logs.
@@ -828,6 +837,11 @@ module Testcontainers
 
     def container_port(port)
       @_container&.json&.dig("NetworkSettings", "Ports", normalize_port(port))&.first&.dig("HostPort")
+    end
+
+    def container_ports
+      ports = @_container&.json&.dig("NetworkSettings", "Ports")&.keys || []
+      ports&.map { |port| port.split("/").first }
     end
 
     def default_gateway_ip
