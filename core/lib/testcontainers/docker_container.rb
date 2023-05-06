@@ -492,7 +492,7 @@ module Testcontainers
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [HealthcheckNotSupportedError] If the container does not support healthchecks.
     def healthy?
-      if supports_healtcheck?
+      if supports_healthcheck?
         @_container&.json&.dig("State", "Health", "Status") == "healthy"
       else
         raise HealthcheckNotSupportedError
@@ -508,9 +508,9 @@ module Testcontainers
     #
     # @return [Boolean] Whether the container supports healthchecks.
     # @raise [ContainerNotStartedError] If the container has not been started.
-    def supports_healtcheck?
+    def supports_healthcheck?
       raise ContainerNotStartedError unless @_container
-      @_container.json["Config"]["Healthcheck"].present?
+      @_container.json["Config"]["Healthcheck"] != nil
     end
 
     # Returns whether the container exists.
