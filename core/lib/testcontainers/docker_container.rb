@@ -594,7 +594,7 @@ module Testcontainers
 
     # Returns the container's first mapped port.
     #
-    # @return [String] The container's first mapped port.
+    # @return [Integer] The container's first mapped port.
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     def first_mapped_port
       raise ContainerNotStartedError unless @_container
