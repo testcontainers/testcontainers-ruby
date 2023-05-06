@@ -1,0 +1,78 @@
+PATH
+  remote: ../core
+  specs:
+    testcontainers-core (0.1.1)
+      docker-api (~> 2.2)
+
+PATH
+  remote: .
+  specs:
+    testcontainers-mysql (0.1.0)
+      testcontainers-core (~> 0.1.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.4.2)
+    docker-api (2.2.0)
+      excon (>= 0.47.0)
+      multi_json
+    excon (0.99.0)
+    json (2.6.3)
+    language_server-protocol (3.17.0.3)
+    lint_roller (1.0.0)
+    minitest (5.18.0)
+    minitest-hooks (1.5.0)
+      minitest (> 5.3)
+    multi_json (1.15.0)
+    mysql2 (0.5.5)
+    parallel (1.23.0)
+    parser (3.2.2.1)
+      ast (~> 2.4.1)
+    rainbow (3.1.1)
+    rake (13.0.6)
+    regexp_parser (2.8.0)
+    rexml (3.2.5)
+    rubocop (1.50.2)
+      json (~> 2.3)
+      parallel (~> 1.10)
+      parser (>= 3.2.0.0)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml (>= 3.2.5, < 4.0)
+      rubocop-ast (>= 1.28.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 3.0)
+    rubocop-ast (1.28.1)
+      parser (>= 3.2.1.0)
+    rubocop-performance (1.16.0)
+      rubocop (>= 1.7.0, < 2.0)
+      rubocop-ast (>= 0.4.0)
+    ruby-progressbar (1.13.0)
+    standard (1.28.2)
+      language_server-protocol (~> 3.17.0.2)
+      lint_roller (~> 1.0)
+      rubocop (~> 1.50.2)
+      standard-custom (~> 1.0.0)
+      standard-performance (~> 1.0.1)
+    standard-custom (1.0.0)
+      lint_roller (~> 1.0)
+    standard-performance (1.0.1)
+      lint_roller (~> 1.0)
+      rubocop-performance (~> 1.16.0)
+    unicode-display_width (2.4.2)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  minitest (~> 5.0)
+  minitest-hooks (~> 1.5)
+  mysql2 (~> 0.5.0)
+  rake (~> 13.0)
+  standard (~> 1.3)
+  testcontainers-core!
+  testcontainers-mysql!
+
+BUNDLED WITH
+   2.4.1
