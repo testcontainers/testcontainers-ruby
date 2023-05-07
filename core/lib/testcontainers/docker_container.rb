@@ -13,11 +13,12 @@ module Testcontainers
   # @attr env [Array<String>, nil] an array of environment variables for the container in the format KEY=VALUE
   # @attr labels [Hash, nil] a hash of labels to be applied to the container
   # @attr working_dir [String, nil] the working directory for the container
+  # @attr healthcheck [Hash, nil] a hash of healthcheck options for the container
   # @attr logger [Logger] a logger instance for the container
   # @attr_reader _container [Docker::Container, nil] the underlying Docker::Container object
   # @attr_reader _id [String, nil] the container's ID
   class DockerContainer
-    attr_accessor :name, :image, :command, :exposed_ports, :port_bindings, :volumes, :filesystem_binds, :env, :labels, :working_dir
+    attr_accessor :name, :image, :command, :exposed_ports, :port_bindings, :volumes, :filesystem_binds, :env, :labels, :working_dir, :healthcheck
     attr_accessor :logger
     attr_reader :_container, :_id
 
@@ -35,7 +36,7 @@ module Testcontainers
     # @param working_dir [String, nil] the working directory for the container
     # @param logger [Logger] a logger instance for the container
     def initialize(image, command: nil, name: nil, exposed_ports: nil, port_bindings: nil, volumes: nil, filesystem_binds: nil, env: nil,
-      labels: nil, working_dir: nil, logger: Testcontainers.logger)
+      labels: nil, working_dir: nil, healthcheck: nil, logger: Testcontainers.logger)
 
       @image = image
       @command = command
@@ -47,6 +48,7 @@ module Testcontainers
       @filesystem_binds = add_filesystem_binds(filesystem_binds) if filesystem_binds
       @labels = add_labels(labels) if labels
       @working_dir = working_dir
+      @healthcheck = add_healthcheck(healthcheck) if healthcheck
       @logger = logger
       @_container = nil
       @_id = nil
@@ -206,6 +208,40 @@ module Testcontainers
       @labels
     end
 
+    # Adds a healthcheck to the container.
+    #
+    # @param options [Hash] the healthcheck options.
+    # @option options [Array|String] :test the command to run to check the health of the container.
+    # @option options [Float] :interval the time in seconds between health checks. (default: 30)
+    # @option options [Float] :timeout the time in seconds to wait for a health check to complete. (default: 30)
+    # @option options [Integer] :retries the number of times to retry a failed health check before giving up. (default: 3)
+    # @option options [Boolean] :shell whether or not to run the health check in a shell. (default: false)
+    # @return [Hash] the healthcheck options for Docker.
+    def add_healthcheck(options = {})
+      test = options[:test]
+
+      if test.nil?
+        @healthcheck =  { "Test" => ["NONE"] }
+        return @healthcheck
+      end
+
+      interval = options[:interval]&.to_f || 30.0
+      timeout = options[:timeout]&.to_f || 30.0
+      retries = options[:retries]&.to_i || 3
+      shell = options[:shell] || false
+
+      test = test.split(" ") if test.is_a?(String)
+      test = shell ? test.unshift("CMD-SHELL") : test.unshift("CMD")
+
+      @healthcheck = {
+        "Test" => test,
+        "Interval" => (interval * 1_000_000_000).to_i,
+        "Timeout" => (timeout * 1_000_000_000).to_i,
+        "Retries" => retries,
+        "StartPeriod" => 0,
+      }
+    end
+
     # Set options for the container configuration using "with_" methods.
     #
     # @param options [Hash] A hash of options where keys correspond to "with_" methods and values are the arguments for those methods.
@@ -320,6 +356,20 @@ module Testcontainers
     # @return [DockerContainer] The updated DockerContainer instance.
     def with_label(label, value)
       add_label(label, value)
+      self
+    end
+
+    # Adds a healthcheck to the container.
+    #
+    # @param options [Hash] the healthcheck options.
+    # @option options [Array|String] :test the command to run to check the health of the container.
+    # @option options [Float] :interval the time in seconds between health checks. (default: 30)
+    # @option options [Float] :timeout the time in seconds to wait for a health check to complete. (default: 30)
+    # @option options [Integer] :retries the number of times to retry a failed health check before giving up. (default: 3)
+    # @option options [Boolean] :shell whether or not to run the health check in a shell. (default: false)
+    # @return [DockerContainer] The updated DockerContainer instance.
+    def with_healthcheck(options = {})
+      add_healthcheck(options)
       self
     end
 
@@ -892,6 +942,7 @@ module Testcontainers
         "Env" => @env,
         "Labels" => @labels,
         "WorkingDir" => @working_dir,
+        "Healthcheck" => @healthcheck,
         "HostConfig" => {
           "PortBindings" => @port_bindings,
           "Binds" => @filesystem_binds
