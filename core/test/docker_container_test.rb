@@ -8,7 +8,7 @@ class DockerContainerTest < TestcontainersTest
 
     @container = Testcontainers::DockerContainer.new("hello-world")
     @long_running_container = Testcontainers::DockerContainer.new("alpine:latest", command: %w[tail -f /dev/null])
-    @nginx_container = Testcontainers::DockerContainer.new("nginx:alpine", exposed_ports: [80], healthcheck: { test: %w[curl -f http://localhost:80] })
+    @nginx_container = Testcontainers::DockerContainer.new("nginx:alpine", exposed_ports: [80], healthcheck: {test: %w[curl -f http://localhost:80]})
   end
 
   def after_all

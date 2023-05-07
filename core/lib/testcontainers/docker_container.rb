@@ -221,7 +221,7 @@ module Testcontainers
       test = options[:test]
 
       if test.nil?
-        @healthcheck =  { "Test" => ["NONE"] }
+        @healthcheck = {"Test" => ["NONE"]}
         return @healthcheck
       end
 
@@ -238,7 +238,7 @@ module Testcontainers
         "Interval" => (interval * 1_000_000_000).to_i,
         "Timeout" => (timeout * 1_000_000_000).to_i,
         "Retries" => retries,
-        "StartPeriod" => 0,
+        "StartPeriod" => 0
       }
     end
 
