@@ -20,6 +20,8 @@ module Testcontainers
 
   class PortNotMappedError < Error; end
 
+  class ContainerLaunchException < Error; end
+
   class << self
     attr_writer :logger
 
