@@ -601,6 +601,16 @@ module Testcontainers
       container_ports.map { |port| mapped_port(port) }.first
     end
 
+    # Returns the value for the given environment variable.
+    #
+    # @param key [String] The environment variable's key.
+    # @return [String] The environment variable's value.
+    # @return [nil] If the environment variable does not exist.
+    def get_env(key)
+      env_entry = env.find { |entry| entry.start_with?("#{key}=") }
+      env_entry ? env_entry.split("=").last : nil
+    end
+
     # Returns the container's logs.
     #
     # @param stdout [Boolean] Whether to return stdout.
