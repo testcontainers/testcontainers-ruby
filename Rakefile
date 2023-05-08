@@ -6,13 +6,14 @@ require "rake/testtask"
 require "yard"
 require "standard/rake"
 
-MODULES = %w[core]
+MODULES = %w[core mysql]
 
 %w[test standard].each do |task_name|
   desc "Run #{task_name} task for all projects"
   task task_name do
     errors = []
     MODULES.each do |project|
+      puts "Running #{task_name} for #{project}"
       system(%(cd #{project} && #{$0} #{task_name} --trace)) || errors << project
     end
     fail("Errors in #{errors.join(", ")}") unless errors.empty?

@@ -6,3 +6,5 @@ source "https://rubygems.org"
 gemspec
 
 gem "testcontainers-core", path: "./core"
+gem "testcontainers-mysql", path: "./mysql"
+gem "mysql2", "~> 0.5.3"
