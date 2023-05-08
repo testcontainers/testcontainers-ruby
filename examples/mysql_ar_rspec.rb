@@ -25,8 +25,6 @@ RSpec.configure do |config|
     container.wait_for_healthcheck
     config.mysql = container
 
-    require "irb" ; binding.irb
-
     ENV["DATABASE_URL"] = container.database_url(protocol: "mysql2")
 
     # In your own tests, you would probably put this ENV["DATABASE_URL"] in your database.yml file instead
@@ -39,7 +37,7 @@ RSpec.configure do |config|
     end
 
     # Ignore in your own tests
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
+    ActiveRecord::Base.logger = Logger.new($stdout)
   end
 
   config.after(:suite) do
