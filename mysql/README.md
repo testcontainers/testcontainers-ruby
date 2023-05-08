@@ -1,30 +1,128 @@
-# Testcontainers
+# Testcontainers module for MySQL
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/testcontainers`. To experiment with that code, run `bin/console` for an interactive prompt.
+testcontainers-mysql simplifies the creation and management of MySQL containers for testing purposes using the Testcontainers library.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add the library to the test section in your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
+```ruby
+group :test do
+  gem 'testcontainers-mysql'
+end
+```
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
 
-If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+And then execute:
+
+```bash
+$ bundle install
+```
+
+Or install it yourself as:
+
+```bash
+$ gem install testcontainers-mysql
+```
+
 
 ## Usage
 
-TODO: Write usage instructions here
+To use the library, you first need to require it:
 
-## Development
+```ruby
+require 'testcontainers/mysql'
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+### Creating a MySQL container
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Create a new instance of the `Testcontainers::MysqlContainer` class:
+
+```ruby
+container = Testcontainers::MysqlContainer.new
+```
+
+
+
+This creates a new container with the default MySQL image, user, password, and database. You can customize these by passing arguments to the constructor:
+
+```ruby
+container = Testcontainers::MysqlContainer.new("mysql:5.7", username: "custom_user", password: "custom_pass", database: "custom_db")
+```
+
+
+### Starting and stopping the container
+
+Start the container:
+
+```ruby
+container.start
+```
+
+
+
+Stop the container when you're done:
+
+```ruby
+container.stop
+```
+
+
+### Connecting to the MySQL container
+
+Once the container is running, you can obtain the connection details using the following methods:
+
+```ruby
+host = container.host
+port = container.first_mapped_port
+```
+
+
+
+Or, you can generate a full database URL:
+
+```ruby
+database_url = container.database_url
+```
+
+Use this URL to connect to the MySQL container using your preferred MySQL client library.
+
+### Customizing the container
+
+You can also customize the container using the following methods:
+
+```ruby
+container.with_database("custom_db")
+container.with_username("custom_user")
+container.with_password("custom_pass")
+```
+
+### Example
+
+Here's a complete example of how to use testcontainers-mysdql to create a container, connect to it, and run a simple query:
+
+```ruby
+require 'testcontainers/mysql'
+require 'mysql2'
+
+container = Testcontainers::MysqlContainer.new
+container.start
+
+client = Mysql2::Client.new(url: container.database_url)
+
+result = client.query("SELECT 1")
+result.each do |row|
+  puts row.inspect
+end
+
+client.close
+container.stop
+```
+
+This example creates a MySQL container, connects to it using the `mysql2` gem, runs a simple `SELECT 1` query, and then stops the container.
+
+### Example with RSpec
 
 ## Contributing
 
