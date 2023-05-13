@@ -1,14 +1,14 @@
 PATH
   remote: ../core
   specs:
-    testcontainers-core (0.1.1)
+    testcontainers-core (0.1.2)
       docker-api (~> 2.2)
 
 PATH
   remote: .
   specs:
     testcontainers-mysql (0.1.0)
-      testcontainers-core (~> 0.1.1)
+      testcontainers-core (~> 0.1.2)
 
 GEM
   remote: https://rubygems.org/
