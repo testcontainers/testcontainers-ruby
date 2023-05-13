@@ -1,0 +1,7 @@
+require_relative "<%= name %>/version"
+require "testcontainers"
+
+module Testcontainers
+  class <%= name.capitalize %>Container < ::Testcontainers::DockerContainer
+  end
+end

@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    thor (1.2.2)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  thor (~> 1.2)
+
+BUNDLED WITH
+   2.4.1
