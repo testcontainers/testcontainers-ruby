@@ -16,9 +16,9 @@ require "rspec/autorun"
 require "testcontainers/mysql"
 
 RSpec.configure do |config|
-  config.before(:suite) do
-    config.add_setting :mysql, default: nil
+  config.add_setting :mysql, default: nil
 
+  config.before(:suite) do
     container = Testcontainers::MysqlContainer.new(database: "posts_test")
     container.with_healthcheck(test: ["/usr/bin/mysql", "--user=test", "--password=test", "--execute", "SHOW DATABASES;"], interval: 1, timeout: 1, retries: 5)
     container.start

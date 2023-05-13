@@ -79,7 +79,6 @@ port = container.first_mapped_port
 ```
 
 
-
 Or, you can generate a full database URL:
 
 ```ruby
@@ -122,7 +121,26 @@ container.stop
 
 This example creates a MySQL container, connects to it using the `mysql2` gem, runs a simple `SELECT 1` query, and then stops the container.
 
-### Example with RSpec
+### Using with RSpec
+
+You can manage the container in the `before(:suite)` / `after(:suite)` blocks in your `spec_helper.rb`:
+
+```ruby
+RSpec.configure do |config|
+  # This helps us to have access to the `RSpec.configuration.mysql_container` without using global variables.
+  config.add_setting :mysql, default: nil
+
+  config.before(:suite) do
+    config.mysql_container = Testcontainers::MysqlContainer.new.start
+    ENV["DATABASE_URL"] = config.mysql_container.database_url(protocol: "mysql2") # or you can expose it to a fixed port and use database.yml for configuration
+  end
+
+  config.after(:suite) do
+    config.mysql_container&.stop
+    config.mysql_container&.remove
+  end
+end
+```
 
 ## Contributing
 

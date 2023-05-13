@@ -14,10 +14,11 @@ require "rspec/autorun"
 require "testcontainers/redis"
 
 RSpec.configure do |config|
+  config.add_setting :redis_container, default: nil
+
   config.before(:suite) do
-    config.add_setting :redis_container, default: nil
     config.redis_container = Testcontainers::RedisContainer.new.start
-    ENV["DATABASE_URL"] = config.redis_container.redis_url
+    ENV["REDIS_URL"] = config.redis_container.redis_url # We use this variable to avoid clashes with other Redis instances runnning on the host
   end
 
   config.after(:suite) do
@@ -28,7 +29,7 @@ end
 
 RSpec.describe "Redis" do
   before(:all) do
-    @redis = Redis.new(url: ENV["DATABASE_URL"])
+    @redis = Redis.new(url: ENV["REDIS_URL"])
   end
 
   before(:each) do
