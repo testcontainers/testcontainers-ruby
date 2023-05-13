@@ -8,7 +8,7 @@ PATH
   remote: .
   specs:
     testcontainers-postgres (0.1.0)
-      testcontainers-core (~> 0.1.1)
+      testcontainers-core (~> 0.1.2)
 
 GEM
   remote: https://rubygems.org/
