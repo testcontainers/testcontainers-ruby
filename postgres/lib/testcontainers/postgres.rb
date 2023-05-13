@@ -18,7 +18,6 @@ module Testcontainers
 
     POSTGRES_DEFAULT_USERNAME = "test"
     POSTGRES_DEFAULT_PASSWORD = "test"
-    POSTGRES_DEFAULT_ROOT_USERNAME = "root"
     POSTGRES_DEFAULT_DATABASE = "test"
 
     attr_reader :port, :username, :password, :database
@@ -47,16 +46,6 @@ module Testcontainers
       with_exposed_ports(@port)
       _configure
       super
-    end
-
-    # Returns the host used to connect to the container
-    # If the host is "localhost", it is replaced by "127.0.0.1" since Postgres fallbacks
-    # to a socket connection with "localhost"
-    #
-    # @return [String] the host used to connect to the container
-    def host
-      host = super
-      (host == "localhost") ? "127.0.0.1" : host
     end
 
     # Returns the database url (e.g. postgres://user:password@host:port/database)
@@ -107,16 +96,12 @@ module Testcontainers
 
     def _configure
       add_env("POSTGRES_DATABASE", @database)
-      add_env("POSTGRES_USER", @username) if @username != POSTGRES_DEFAULT_ROOT_USERNAME
+      add_env("POSTGRES_USER", @username)
 
-      if !@password.nil? && !@password.empty?
-        add_env("POSTGRES_PASSWORD", @password)
-        add_env("POSTGRES_ROOT_PASSWORD", @password)
-      elsif @username == POSTGRES_DEFAULT_ROOT_USERNAME
-        add_env("POSTGRES_ALLOW_EMPTY_PASSWORD", "yes")
-      else
-        raise ContainerLaunchException, "Password is required for non-root users"
-      end
+      raise ContainerLaunchException, "Password is required for non-root users" if @password.nil? || @password.empty?
+
+      add_env("POSTGRES_PASSWORD", @password)
+      add_env("POSTGRES_ROOT_PASSWORD", @password)
     end
   end
 end

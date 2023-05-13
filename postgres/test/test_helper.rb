@@ -3,7 +3,7 @@ require "testcontainers/postgres"
 
 require "minitest/autorun"
 require "minitest/hooks/test"
-#require "postgres"
+require 'pg'
 
 class TestcontainersTest < Minitest::Test
   include Minitest::Hooks
