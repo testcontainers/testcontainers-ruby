@@ -57,8 +57,6 @@ class NginxContainerTest < TestcontainersTest
   end
 
   def test_it_is_reachable
-    @container.wait_for_logs(/start worker process/)
-
     uri = URI.parse(@container.server_url)
     response = Net::HTTP.get_response(uri)
 
