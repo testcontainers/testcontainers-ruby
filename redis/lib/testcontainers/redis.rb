@@ -25,6 +25,7 @@ module Testcontainers
       super(image, **kwargs)
       @port = port || ENV.fetch("REDIS_PORT", REDIS_DEFAULT_PORT)
       @password = password || ENV.fetch("REDIS_PASSWORD", nil)
+      @wait_for ||= add_wait_for(:logs, /Ready to accept connections/)
     end
 
     # Starts the container

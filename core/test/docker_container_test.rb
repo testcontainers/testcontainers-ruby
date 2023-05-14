@@ -8,7 +8,7 @@ class DockerContainerTest < TestcontainersTest
 
     @container = Testcontainers::DockerContainer.new("hello-world")
     @long_running_container = Testcontainers::DockerContainer.new("alpine:latest", command: %w[tail -f /dev/null])
-    @nginx_container = Testcontainers::DockerContainer.new("nginx:alpine", exposed_ports: [80], healthcheck: {test: %w[curl -f http://localhost:80]})
+    @nginx_container = Testcontainers::DockerContainer.new("nginx:alpine", exposed_ports: [80], healthcheck: {test: %w[curl -f http://localhost:80]}, wait_for: [:logs, /start worker process/])
   end
 
   def after_all
@@ -152,6 +152,34 @@ class DockerContainerTest < TestcontainersTest
     assert_equal({"foo" => "bar"}, container.labels)
   end
 
+  def test_it_adds_a_wait_for_with_default
+    container = Testcontainers::DockerContainer.new("hello-world", exposed_ports: [80])
+    container.add_wait_for
+
+    assert_kind_of(Proc, container.wait_for)
+  end
+
+  def test_it_adds_a_wait_for_with_proc
+    container = Testcontainers::DockerContainer.new("hello-world")
+    container.add_wait_for(proc { |c| sleep 1 })
+
+    assert_kind_of(Proc, container.wait_for)
+  end
+
+  def test_it_adds_a_wait_for_with_block
+    container = Testcontainers::DockerContainer.new("hello-world")
+    container.add_wait_for { |c| sleep 1 }
+
+    assert_kind_of(Proc, container.wait_for)
+  end
+
+  def test_it_adds_a_wait_for_with_hash
+    container = Testcontainers::DockerContainer.new("hello-world")
+    container.add_wait_for("logs", /Hello from Docker!/)
+
+    assert_kind_of(Proc, container.wait_for)
+  end
+
   def test_it_can_be_mutated_with_the_with_method
     container = Testcontainers::DockerContainer.new("hello-world")
       .with(name: "foobar")
@@ -163,6 +191,7 @@ class DockerContainerTest < TestcontainersTest
       .with(labels: {"foo" => "bar"})
       .with(env: {"PATH" => "/usr/bin"})
       .with(working_dir: "/app")
+      .with(wait_for: [:logs, /Hello from Docker!/])
 
     assert_equal("foobar", container.name)
     assert_equal(%w[tail -f /dev/null], container.command)
@@ -173,6 +202,7 @@ class DockerContainerTest < TestcontainersTest
     assert_equal({"foo" => "bar"}, container.labels)
     assert_equal(["PATH=/usr/bin"], container.env)
     assert_equal("/app", container.working_dir)
+    assert_kind_of(Proc, container.wait_for)
   end
 
   def test_it_starts_a_container
@@ -248,9 +278,8 @@ class DockerContainerTest < TestcontainersTest
     container.remove
   end
 
-  def test_mapped_ports_with_dinamic_port
+  def test_mapped_ports_with_dynamic_port
     @nginx_container.start
-    @nginx_container.wait_for_logs(/start worker process/)
 
     assert @nginx_container.mapped_port(80) > 32768
   ensure

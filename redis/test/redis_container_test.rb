@@ -61,8 +61,6 @@ class RedisContainerTest < TestcontainersTest
   end
 
   def test_it_is_reachable
-    @container.wait_for_logs(/Ready to accept connections/)
-
     client = Redis.new(host: @host, port: @port, db: 0)
     assert_equal "PONG", client.ping
   end

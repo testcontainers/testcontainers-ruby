@@ -38,6 +38,8 @@ module Testcontainers
       @username = username || ENV.fetch("MYSQL_USER", MYSQL_DEFAULT_USERNAME)
       @password = password || ENV.fetch("MYSQL_PASSWORD", MYSQL_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("MYSQL_DATABASE", MYSQL_DEFAULT_DATABASE)
+      @healthcheck ||= add_healthcheck(_default_healthcheck_options)
+      @wait_for ||= add_wait_for(:healthcheck)
     end
 
     # Starts the container
@@ -117,6 +119,10 @@ module Testcontainers
       else
         raise ContainerLaunchException, "Password is required for non-root users"
       end
+    end
+
+    def _default_healthcheck_options
+      {test: ["/usr/bin/mysql", "--protocol=TCP", "--port=#{@port}", "--user=#{@username}", "--password=#{@password}", @database, "--silent", "--execute=SELECT 1;"], interval: 1, timeout: 5, retries: 5}
     end
   end
 end

@@ -18,7 +18,8 @@ module Testcontainers
   # @attr_reader _container [Docker::Container, nil] the underlying Docker::Container object
   # @attr_reader _id [String, nil] the container's ID
   class DockerContainer
-    attr_accessor :name, :image, :command, :exposed_ports, :port_bindings, :volumes, :filesystem_binds, :env, :labels, :working_dir, :healthcheck
+    attr_accessor :name, :image, :command, :exposed_ports, :port_bindings, :volumes, :filesystem_binds,
+      :env, :labels, :working_dir, :healthcheck, :wait_for
     attr_accessor :logger
     attr_reader :_container, :_id
 
@@ -36,7 +37,7 @@ module Testcontainers
     # @param working_dir [String, nil] the working directory for the container
     # @param logger [Logger] a logger instance for the container
     def initialize(image, command: nil, name: nil, exposed_ports: nil, port_bindings: nil, volumes: nil, filesystem_binds: nil, env: nil,
-      labels: nil, working_dir: nil, healthcheck: nil, logger: Testcontainers.logger)
+      labels: nil, working_dir: nil, healthcheck: nil, wait_for: nil, logger: Testcontainers.logger)
 
       @image = image
       @command = command
@@ -49,6 +50,7 @@ module Testcontainers
       @labels = add_labels(labels) if labels
       @working_dir = working_dir
       @healthcheck = add_healthcheck(healthcheck) if healthcheck
+      @wait_for = add_wait_for(wait_for)
       @logger = logger
       @_container = nil
       @_id = nil
@@ -242,6 +244,51 @@ module Testcontainers
       }
     end
 
+    # Add a wait_for strategy to the container configuration.
+    #
+    # @param method [Symbol, String, Proc, Array] The method to call on the container to wait for it to be ready.
+    # @param args [Array] The arguments to pass to the method if it is a symbol or string.
+    # @param kwargs [Hash] The keyword arguments to pass to the method if it is a symbol or string.
+    # @param block [Proc] The block to call on the container to wait for it to be ready.
+    # @return [Proc] The wait_for strategy.
+    def add_wait_for(method = nil, *args, **kwargs, &block)
+      if method.nil?
+        if block
+          if block.arity == 1
+            @wait_for = block
+          else
+            raise ArgumentError, "Invalid wait_for block: #{block}"
+          end
+        elsif @exposed_ports && !@exposed_ports.empty?
+          port = @exposed_ports.keys.first.split("/").first
+          @wait_for = ->(container) { container.wait_for_tcp_port(port) }
+        end
+      elsif method.is_a?(Proc)
+        if method.arity == 1
+          @wait_for = method
+        else
+          raise ArgumentError, "Invalid wait_for method: #{method}"
+        end
+      elsif method.is_a?(Array)
+        method_name = "wait_for_#{method[0]}".to_sym
+        args = method[1] || []
+        kwargs = method[2] || {}
+        if respond_to?(method_name)
+          @wait_for = ->(container) { container.send(method_name, *args, **kwargs) }
+        else
+          raise ArgumentError, "Invalid wait_for method: #{method_name}"
+        end
+      else
+        method_name = "wait_for_#{method}".to_sym
+        if respond_to?(method_name)
+          @wait_for = ->(container) { container.send(method_name, *args, **kwargs) }
+        else
+          raise ArgumentError, "Invalid wait_for method: #{method_name}"
+        end
+      end
+      @wait_for
+    end
+
     # Set options for the container configuration using "with_" methods.
     #
     # @param options [Hash] A hash of options where keys correspond to "with_" methods and values are the arguments for those methods.
@@ -373,6 +420,17 @@ module Testcontainers
       self
     end
 
+    # Add a wait_for strategy to the container configuration.
+    #
+    # @param method [Symbol, String, Proc, Array] The method to call on the container to wait for it to be ready.
+    # @param args [Array] The arguments to pass to the method if it is a symbol or string.
+    # @param kwargs [Hash] The keyword arguments to pass to the method if it is a symbol or string.
+    # @param block [Proc] The block to call on the container to wait for it to be ready.
+    def with_wait_for(method = nil, *args, **kwargs, &block)
+      add_wait_for(method, *args, **kwargs, &block)
+      self
+    end
+
     # Starts the container, yields the container instance to the block, and stops the container.
     #
     # @yield [DockerContainer] The container instance.
@@ -396,9 +454,10 @@ module Testcontainers
 
       @_id = @_container.id
       json = @_container.json
-
       @name = json["Name"]
       @_created_at = json["Created"]
+
+      @wait_for&.call(self)
 
       self
     rescue Excon::Error::Socket => e

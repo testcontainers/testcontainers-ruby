@@ -23,6 +23,7 @@ module Testcontainers
     def initialize(image = NGINX_DEFAULT_IMAGE, port: nil, **kwargs)
       super(image, **kwargs)
       @port = port || ENV.fetch("NGINX_PORT", NGINX_DEFAULT_PORT)
+      @wait_for ||= add_wait_for(:logs, /start worker process/)
     end
 
     # Starts the container

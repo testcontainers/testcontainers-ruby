@@ -37,6 +37,8 @@ module Testcontainers
       @username = username || ENV.fetch("POSTGRES_USER", POSTGRES_DEFAULT_USERNAME)
       @password = password || ENV.fetch("POSTGRES_PASSWORD", POSTGRES_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("POSTGRES_DATABASE", POSTGRES_DEFAULT_DATABASE)
+      @healthcheck ||= add_healthcheck(_default_healthcheck_options)
+      @wait_for ||= add_wait_for(:healthcheck)
     end
 
     # Starts the container
@@ -102,6 +104,10 @@ module Testcontainers
 
       add_env("POSTGRES_PASSWORD", @password)
       add_env("POSTGRES_ROOT_PASSWORD", @password)
+    end
+
+    def _default_healthcheck_options
+      {test: ["psql", "--port=#{@port}", "--user=#{@username}", "--dbname=#{@database}", "--quiet", "-c", "\\l"], interval: 1, timeout: 5, retries: 5}
     end
   end
 end
