@@ -8,7 +8,6 @@ class PostgresContainerTest < TestcontainersTest
     super
 
     @container = Testcontainers::PostgresContainer.new
-    @container.with_healthcheck(test: ["psql", "--user=test", "--host=localhost", "-c", "\\l"], interval: 1, timeout: 1, retries: 5)
     @container.start
     @host = @container.host
     @port = @container.first_mapped_port
@@ -82,11 +81,6 @@ class PostgresContainerTest < TestcontainersTest
   end
 
   def test_it_is_reachable
-    @container.wait_for_logs(/database system is ready to accept connections/)
-
-    # turns out the log message is not enough to ensure the server is ready
-    @container.wait_for_healthcheck
-
     client = PG.connect(host: @host, user: "test", password: "test", port: @port, dbname: "test")
     assert_equal({"number" => "1"}, client.exec("SELECT 1 AS number").first)
   end
