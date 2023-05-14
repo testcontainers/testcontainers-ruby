@@ -426,6 +426,7 @@ module Testcontainers
     # @param args [Array] The arguments to pass to the method if it is a symbol or string.
     # @param kwargs [Hash] The keyword arguments to pass to the method if it is a symbol or string.
     # @param block [Proc] The block to call on the container to wait for it to be ready.
+    # @return [DockerContainer] The updated DockerContainer instance.
     def with_wait_for(method = nil, *args, **kwargs, &block)
       add_wait_for(method, *args, **kwargs, &block)
       self
