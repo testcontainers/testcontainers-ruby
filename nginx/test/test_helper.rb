@@ -3,7 +3,6 @@ require "testcontainers/nginx"
 
 require "minitest/autorun"
 require "minitest/hooks/test"
-require "net/http"
 
 class TestcontainersTest < Minitest::Test
   include Minitest::Hooks

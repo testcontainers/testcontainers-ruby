@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "redis"
 
 class RedisContainerTest < TestcontainersTest
   def before_all

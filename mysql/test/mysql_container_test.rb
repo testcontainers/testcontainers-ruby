@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "mysql2"
 
 class MysqlContainerTest < TestcontainersTest
   def before_all

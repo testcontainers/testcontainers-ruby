@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "net/http"
 
 class NginxContainerTest < TestcontainersTest
   def before_all
