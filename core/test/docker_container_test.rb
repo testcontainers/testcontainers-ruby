@@ -123,6 +123,18 @@ class DockerContainerTest < TestcontainersTest
     assert_equal({"80/tcp" => [{"HostPort" => "8080"}], "443/tcp" => [{"HostPort" => "8081"}]}, container.port_bindings)
   end
 
+  def test_it_adds_exposed_ports_without_overwriting_fixed_exposed_ports
+    container = Testcontainers::DockerContainer.new("hello-world")
+    container.add_fixed_exposed_port(80, 8080)
+
+    assert_equal({"80/tcp" => {}}, container.exposed_ports)
+    assert_equal({"80/tcp" => [{"HostPort" => "8080"}]}, container.port_bindings)
+
+    container.add_exposed_ports(80)
+    assert_equal({"80/tcp" => {}}, container.exposed_ports)
+    assert_equal({"80/tcp" => [{"HostPort" => "8080"}]}, container.port_bindings)
+  end
+
   def test_it_adds_a_volume
     container = Testcontainers::DockerContainer.new("hello-world")
 
