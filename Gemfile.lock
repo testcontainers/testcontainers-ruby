@@ -17,6 +17,12 @@ PATH
       testcontainers-core (~> 0.1.2)
 
 PATH
+  remote: mariadb
+  specs:
+    testcontainers-mariadb (0.1.0)
+      testcontainers-core (~> 0.1.2)
+
+PATH
   remote: mysql
   specs:
     testcontainers-mysql (0.1.0)
@@ -129,6 +135,7 @@ DEPENDENCIES
   testcontainers!
   testcontainers-core!
   testcontainers-elasticsearch!
+  testcontainers-mariadb!
   testcontainers-mysql!
   testcontainers-nginx!
   testcontainers-postgres!
