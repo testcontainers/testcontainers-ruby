@@ -291,11 +291,14 @@ class DockerContainerTest < TestcontainersTest
   end
 
   def test_mapped_ports_with_dynamic_port
-    @nginx_container.start
+    container = Testcontainers::DockerContainer.new("nginx:alpine").with_exposed_port(80)
+    container.start
+    container.wait_for_logs(/start worker process/)
 
-    assert @nginx_container.mapped_port(80) > 32768
+    assert container.mapped_port(80) > 32768
   ensure
-    @nginx_container.stop! if @nginx_container.running?
+    container&.stop! if container&.running?
+    container&.remove
   end
 
   def test_mapped_ports_with_static_port
