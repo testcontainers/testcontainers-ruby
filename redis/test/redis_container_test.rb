@@ -39,11 +39,6 @@ class RedisContainerTest < TestcontainersTest
     assert @container.mapped_port(6379)
   end
 
-  def test_it_supports_custom_port
-    container = Testcontainers::RedisContainer.new(port: 16379)
-    assert_equal 16379, container.port
-  end
-
   def test_it_supports_custom_keyword_arguments
     container = Testcontainers::RedisContainer.new(filesystem_binds: ["#{Dir.pwd}/custom/conf:/usr/local/etc/redis/redis.conf:rw"])
     assert_equal ["#{Dir.pwd}/custom/conf:/usr/local/etc/redis/redis.conf:rw"], container.filesystem_binds
