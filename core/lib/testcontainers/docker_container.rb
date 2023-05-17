@@ -1019,4 +1019,7 @@ module Testcontainers
       }.compact
     end
   end
+
+  # Alias for forward-compatibility
+  GenericContainer = DockerContainer
 end
