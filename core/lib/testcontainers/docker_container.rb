@@ -356,6 +356,15 @@ module Testcontainers
       self
     end
 
+    # Adds a single exposed port to the container.
+    #
+    # @param port [String, Integer] The port to expose.
+    # @return [DockerContainer] The updated DockerContainer instance.
+    def with_exposed_port(port)
+      add_exposed_ports(port)
+      self
+    end
+
     # Adds a fixed exposed port to the container.
     #
     # @param container_port [String, Integer, Hash] The container port in the format "port/protocol" or as an integer.
