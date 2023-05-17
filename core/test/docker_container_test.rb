@@ -291,7 +291,7 @@ class DockerContainerTest < TestcontainersTest
   end
 
   def test_mapped_ports_with_dynamic_port
-    container = Testcontainers::DockerContainer.new("nginx:alpine").with_exposed_port(80)
+    container = Testcontainers::DockerContainer.new("nginx:alpine").with_exposed_ports(80)
     container.start
     container.wait_for_logs(/start worker process/)
 
