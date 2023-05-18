@@ -4,7 +4,6 @@ require "testcontainers"
 module Testcontainers
   # MariadbContainer class is used to manage containers that runs a MariaDB database
   #
-  # @attr_reader [String] port used by the container
   # @attr_reader [String] username used by the container
   # @attr_reader [String] password used by the container
   # @attr_reader [String] database used by the container
@@ -20,7 +19,7 @@ module Testcontainers
     MARIADB_DEFAULT_ROOT_USERNAME = "root"
     MARIADB_DEFAULT_DATABASE = "test"
 
-    attr_reader :port, :username, :password, :database
+    attr_reader :username, :password, :database
 
     # Initializes a new instance of MariadbContainer
     #
@@ -33,7 +32,6 @@ module Testcontainers
     # @return [MariadbContainer] a new instance of MariadbContainer
     def initialize(image = MARIADB_DEFAULT_IMAGE, username: nil, password: nil, database: nil, port: nil, **kwargs)
       super(image, **kwargs)
-      @port = port || ENV.fetch("MARIADB_PORT", MARIADB_DEFAULT_PORT)
       @username = username || ENV.fetch("MARIADB_USER", MARIADB_DEFAULT_USERNAME)
       @password = password || ENV.fetch("MARIADB_PASSWORD", MARIADB_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("MARIADB_DATABASE", MARIADB_DEFAULT_DATABASE)
@@ -45,7 +43,7 @@ module Testcontainers
     #
     # @return [MariadbContainer] self
     def start
-      with_exposed_ports(@port)
+      with_exposed_ports(port)
       _configure
       super
     end
@@ -58,6 +56,13 @@ module Testcontainers
     def host
       host = super
       (host == "localhost") ? "127.0.0.1" : host
+    end
+
+    # Returns the port used by the container
+    #
+    # @return [Integer] the port used by the container
+    def port
+      MARIADB_DEFAULT_PORT
     end
 
     # Returns the database url (e.g. mariadb://user:password@host:port/database)
@@ -121,7 +126,7 @@ module Testcontainers
     end
 
     def _default_healthcheck_options
-      {test: ["/usr/bin/mysql", "--protocol=TCP", "--port=#{@port}", "--user=#{@username}", "--password=#{@password}", @database, "--silent", "--execute=SELECT 1;"], interval: 1, timeout: 5, retries: 5}
+      {test: ["/usr/bin/mysql", "--protocol=TCP", "--port=#{port}", "--user=#{username}", "--password=#{password}", database, "--silent", "--execute=SELECT 1;"], interval: 1, timeout: 5, retries: 5}
     end
   end
 end

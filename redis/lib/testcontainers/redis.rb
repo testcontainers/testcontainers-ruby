@@ -3,9 +3,6 @@ require "testcontainers"
 
 module Testcontainers
   # RedisContainer class is used to manage containers that run a Redis database
-  #
-  # @attr_reader [String] port used by the container
-  # @attr_reader [String] password used by the container
   class RedisContainer < ::Testcontainers::DockerContainer
     # Default port used by the container
     REDIS_DEFAULT_PORT = 6379
@@ -33,6 +30,7 @@ module Testcontainers
     end
 
     # Returns the port used by the container
+    #
     # @return [Integer] the port used by the container
     def port
       REDIS_DEFAULT_PORT

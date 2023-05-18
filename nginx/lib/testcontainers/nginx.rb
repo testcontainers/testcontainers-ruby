@@ -3,16 +3,12 @@ require "testcontainers"
 
 module Testcontainers
   # NginxContainer class is used to manage containers that run an NGINX server
-  #
-  # @attr_reader [String] port used by the container
   class NginxContainer < ::Testcontainers::DockerContainer
     # Default port used by the container
     NGINX_DEFAULT_PORT = 80
 
     # Default image used by the container
     NGINX_DEFAULT_IMAGE = "nginx:latest"
-
-    attr_reader :port
 
     # Initializes a new instance of NginxContainer
     #
@@ -22,7 +18,6 @@ module Testcontainers
     # @return [NginxContainer] a new instance of NginxContainer
     def initialize(image = NGINX_DEFAULT_IMAGE, port: nil, **kwargs)
       super(image, **kwargs)
-      @port = port || ENV.fetch("NGINX_PORT", NGINX_DEFAULT_PORT)
       @wait_for ||= add_wait_for(:logs, /start worker process/)
     end
 
@@ -30,8 +25,15 @@ module Testcontainers
     #
     # @return [NginxContainer] self
     def start
-      with_exposed_ports(@port)
+      with_exposed_ports(port)
       super
+    end
+
+    # Returns the port used by the container
+    #
+    # @return [Integer] the port used by the container
+    def port
+      NGINX_DEFAULT_PORT
     end
 
     # Returns the server url (e.g. http://host:port)
