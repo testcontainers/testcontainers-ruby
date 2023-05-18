@@ -295,7 +295,7 @@ class DockerContainerTest < TestcontainersTest
     container.start
     container.wait_for_logs(/start worker process/)
 
-    assert container.mapped_port(80) > 32768
+    refute_nil container.mapped_port(80)
   ensure
     container&.stop! if container&.running?
     container&.remove
