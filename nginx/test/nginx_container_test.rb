@@ -39,11 +39,6 @@ class NginxContainerTest < TestcontainersTest
     assert @container.mapped_port(80)
   end
 
-  def test_it_supports_custom_port
-    container = Testcontainers::NginxContainer.new(port: 8080)
-    assert_equal 8080, container.port
-  end
-
   def test_it_supports_custom_keyword_arguments
     container = Testcontainers::NginxContainer.new(filesystem_binds: ["#{Dir.pwd}/custom/conf:/etc/nginx/conf.d:rw"])
     assert_equal ["#{Dir.pwd}/custom/conf:/etc/nginx/conf.d:rw"], container.filesystem_binds

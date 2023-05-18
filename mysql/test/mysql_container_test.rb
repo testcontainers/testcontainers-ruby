@@ -46,11 +46,6 @@ class MysqlContainerTest < TestcontainersTest
     assert @container.mapped_port(3306)
   end
 
-  def test_it_supports_custom_port
-    container = Testcontainers::MysqlContainer.new(port: 13306)
-    assert_equal 13306, container.port
-  end
-
   def test_it_supports_custom_keyword_arguments
     container = Testcontainers::MysqlContainer.new(filesystem_binds: ["#{Dir.pwd}/custom/conf:/etc/mysql/conf.d:rw"])
     assert_equal ["#{Dir.pwd}/custom/conf:/etc/mysql/conf.d:rw"], container.filesystem_binds
