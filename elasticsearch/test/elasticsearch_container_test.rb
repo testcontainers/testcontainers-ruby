@@ -44,16 +44,6 @@ class ElasticsearchContainerTest < TestcontainersTest
     assert @container.mapped_port(9300)
   end
 
-  def test_it_supports_custom_http_port
-    container = Testcontainers::ElasticsearchContainer.new(http_port: 19200)
-    assert_equal 19200, container.http_port
-  end
-
-  def test_it_supports_custom_tcp_port
-    container = Testcontainers::ElasticsearchContainer.new(tcp_port: 19300)
-    assert_equal 19300, container.tcp_port
-  end
-
   def test_it_returns_the_default_elasticsearch_url
     assert_equal "http://elastic:elastic@#{@host}:#{@http_port}", @container.elasticsearch_url
   end

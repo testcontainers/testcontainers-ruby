@@ -46,11 +46,6 @@ class PostgresContainerTest < TestcontainersTest
     assert @container.mapped_port(5432)
   end
 
-  def test_it_supports_custom_port
-    container = Testcontainers::PostgresContainer.new(port: 13306)
-    assert_equal 13306, container.port
-  end
-
   def test_it_supports_custom_keyword_arguments
     container = Testcontainers::PostgresContainer.new(filesystem_binds: ["#{Dir.pwd}/custom/conf:/var/lib/postgresql/data/postgresql.conf:rw"])
     assert_equal ["#{Dir.pwd}/custom/conf:/var/lib/postgresql/data/postgresql.conf:rw"], container.filesystem_binds

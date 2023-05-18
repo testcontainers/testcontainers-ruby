@@ -5,7 +5,6 @@ require "uri"
 module Testcontainers
   # PostgresContainer class is used to manage containers that runs a PostgresQL database
   #
-  # @attr_reader [String] port used by the container
   # @attr_reader [String] username used by the container
   # @attr_reader [String] password used by the container
   # @attr_reader [String] database used by the container
@@ -20,7 +19,7 @@ module Testcontainers
     POSTGRES_DEFAULT_PASSWORD = "test"
     POSTGRES_DEFAULT_DATABASE = "test"
 
-    attr_reader :port, :username, :password, :database
+    attr_reader :username, :password, :database
 
     # Initializes a new instance of PostgresContainer
     #
@@ -33,7 +32,6 @@ module Testcontainers
     # @return [PostgresContainer] a new instance of PostgresContainer
     def initialize(image = POSTGRES_DEFAULT_IMAGE, username: nil, password: nil, database: nil, port: nil, **kwargs)
       super(image, **kwargs)
-      @port = port || ENV.fetch("POSTGRES_PORT", POSTGRES_DEFAULT_PORT)
       @username = username || ENV.fetch("POSTGRES_USER", POSTGRES_DEFAULT_USERNAME)
       @password = password || ENV.fetch("POSTGRES_PASSWORD", POSTGRES_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("POSTGRES_DATABASE", POSTGRES_DEFAULT_DATABASE)
@@ -45,9 +43,16 @@ module Testcontainers
     #
     # @return [PostgresContainer] self
     def start
-      with_exposed_ports(@port)
+      with_exposed_ports(port)
       _configure
       super
+    end
+
+    # Returns the port used by the container
+    #
+    # @return [Integer] the port used by the container
+    def port
+      POSTGRES_DEFAULT_PORT
     end
 
     # Returns the database url (e.g. postgres://user:password@host:port/database)
@@ -107,7 +112,7 @@ module Testcontainers
     end
 
     def _default_healthcheck_options
-      {test: ["psql", "--port=#{@port}", "--user=#{@username}", "--dbname=#{@database}", "--quiet", "-c", "\\l"], interval: 1, timeout: 5, retries: 5}
+      {test: ["psql", "--port=#{port}", "--user=#{username}", "--dbname=#{database}", "--quiet", "-c", "\\l"], interval: 1, timeout: 5, retries: 5}
     end
   end
 end

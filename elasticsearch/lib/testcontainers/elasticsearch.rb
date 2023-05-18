@@ -5,8 +5,6 @@ module Testcontainers
   # ElasticsearchContainer class is used to manage Docker containers running Elasticsearch.
   # It extends the generic DockerContainer class and provides Elasticsearch-specific functionality.
   #
-  # @attr_reader http_port [Integer] the port exposed for HTTP traffic
-  # @attr_reader tcp_port [Integer] the port exposed for TCP traffic
   # @attr_reader username [String] the Elasticsearch username
   # @attr_reader password [String] the Elasticsearch password
   class ElasticsearchContainer < ::Testcontainers::DockerContainer
@@ -16,7 +14,7 @@ module Testcontainers
     ELASTICSEARCH_DEFAULT_USERNAME = "elastic"
     ELASTICSEARCH_DEFAULT_PASSWORD = "elastic"
 
-    attr_reader :http_port, :tcp_port, :username, :password
+    attr_reader :username, :password
 
     # Initializes a new ElasticsearchContainer instance.
     #
@@ -29,8 +27,6 @@ module Testcontainers
     # @return [ElasticsearchContainer] a new ElasticsearchContainer instance
     def initialize(image = ELASTICSEARCH_DEFAULT_IMAGE, http_port: nil, tcp_port: nil, username: nil, password: nil, **kwargs)
       super(image, **kwargs)
-      @http_port = http_port || ELASTICSEARCH_DEFAULT_HTTP_PORT
-      @tcp_port = tcp_port || ELASTICSEARCH_DEFAULT_TCP_PORT
       @username = username || ELASTICSEARCH_DEFAULT_USERNAME
       @password = password || ELASTICSEARCH_DEFAULT_PASSWORD
       @healthcheck ||= add_healthcheck(_default_healthcheck_options)
@@ -41,9 +37,23 @@ module Testcontainers
     #
     # @return [ElasticsearchContainer] self
     def start
-      with_exposed_ports(@http_port, @tcp_port)
+      with_exposed_ports(http_port, tcp_port)
       _configure
       super
+    end
+
+    # Returns the HTTP port used by the container
+    #
+    # @return [Integer] the port used by the container
+    def http_port
+      ELASTICSEARCH_DEFAULT_HTTP_PORT
+    end
+
+    # Returns the TCP (transport) port used by the container
+    #
+    # @return [Integer] the port used by the container
+    def tcp_port
+      ELASTICSEARCH_DEFAULT_TCP_PORT
     end
 
     # Returns the URL to access Elasticsearch
@@ -59,7 +69,7 @@ module Testcontainers
       end
       username ||= @username
       password ||= @password
-      port ||= @http_port
+      port ||= http_port
 
       "#{protocol}://#{username}:#{password}@#{host}:#{mapped_port(port)}"
     end
@@ -73,7 +83,7 @@ module Testcontainers
     end
 
     def _default_healthcheck_options
-      {test: ["curl", "--silent", "--fail", "localhost:#{@http_port}/_cluster/health"], interval: 1, timeout: 5, retries: 5}
+      {test: ["curl", "--silent", "--fail", "localhost:#{http_port}/_cluster/health"], interval: 1, timeout: 5, retries: 5}
     end
   end
 end

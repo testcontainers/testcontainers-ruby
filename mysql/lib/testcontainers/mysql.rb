@@ -5,7 +5,6 @@ require "uri"
 module Testcontainers
   # MysqlContainer class is used to manage containers that runs a MySQL database
   #
-  # @attr_reader [String] port used by the container
   # @attr_reader [String] username used by the container
   # @attr_reader [String] password used by the container
   # @attr_reader [String] database used by the container
@@ -21,7 +20,7 @@ module Testcontainers
     MYSQL_DEFAULT_ROOT_USERNAME = "root"
     MYSQL_DEFAULT_DATABASE = "test"
 
-    attr_reader :port, :username, :password, :database
+    attr_reader :username, :password, :database
 
     # Initializes a new instance of MysqlContainer
     #
@@ -34,7 +33,6 @@ module Testcontainers
     # @return [MysqlContainer] a new instance of MysqlContainer
     def initialize(image = MYSQL_DEFAULT_IMAGE, username: nil, password: nil, database: nil, port: nil, **kwargs)
       super(image, **kwargs)
-      @port = port || ENV.fetch("MYSQL_PORT", MYSQL_DEFAULT_PORT)
       @username = username || ENV.fetch("MYSQL_USER", MYSQL_DEFAULT_USERNAME)
       @password = password || ENV.fetch("MYSQL_PASSWORD", MYSQL_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("MYSQL_DATABASE", MYSQL_DEFAULT_DATABASE)
@@ -46,7 +44,7 @@ module Testcontainers
     #
     # @return [MysqlContainer] self
     def start
-      with_exposed_ports(@port)
+      with_exposed_ports(port)
       _configure
       super
     end
@@ -59,6 +57,13 @@ module Testcontainers
     def host
       host = super
       (host == "localhost") ? "127.0.0.1" : host
+    end
+
+    # Returns the port used by the container
+    #
+    # @return [Integer] the port used by the container
+    def port
+      MYSQL_DEFAULT_PORT
     end
 
     # Returns the database url (e.g. mysql://user:password@host:port/database)
@@ -122,7 +127,7 @@ module Testcontainers
     end
 
     def _default_healthcheck_options
-      {test: ["/usr/bin/mysql", "--protocol=TCP", "--port=#{@port}", "--user=#{@username}", "--password=#{@password}", @database, "--silent", "--execute=SELECT 1;"], interval: 1, timeout: 5, retries: 5}
+      {test: ["/usr/bin/mysql", "--protocol=TCP", "--port=#{port}", "--user=#{username}", "--password=#{password}", database, "--silent", "--execute=SELECT 1;"], interval: 1, timeout: 5, retries: 5}
     end
   end
 end
