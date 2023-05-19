@@ -20,7 +20,7 @@ module Testcontainers
     MONGO_DEFAULT_ROOT_USERNAME = "root"
     MONGO_DEFAULT_DATABASE = "test"
 
-    attr_reader :port, :username, :password, :database
+    attr_reader :username, :password, :database
 
     # Initializes a new instance of MongoContainer
     #
@@ -31,9 +31,8 @@ module Testcontainers
     # @param port [String] the port to use
     # @param kwargs [Hash] the options to pass to the container. See {DockerContainer#initialize}
     # @return [MongoContainer] a new instance of MongoContainer
-    def initialize(image = MONGO_DEFAULT_IMAGE, username: nil, password: nil, database: nil, port: nil, **kwargs)
+    def initialize(image = MONGO_DEFAULT_IMAGE, username: nil, password: nil, database: nil, **kwargs)
       super(image, **kwargs)
-      @port = port || ENV.fetch("MONGO_PORT", MONGO_DEFAULT_PORT)
       @username = username || ENV.fetch("MONGO_USERNAME", MONGO_DEFAULT_USERNAME)
       @password = password || ENV.fetch("MONGO_PASSWORD", MONGO_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("MONGO_DATABASE", MONGO_DEFAULT_DATABASE)
@@ -43,9 +42,16 @@ module Testcontainers
     #
     # @return [MongoContainer] self
     def start
-      with_exposed_ports(@port)
+      with_exposed_ports(port)
       _configure
       super
+    end
+
+    # Returns the port used by the container
+    #
+    # @return [Integer] the port used by the container
+    def port
+      MONGO_DEFAULT_PORT
     end
 
     # Returns the database url (e.g. mongodb://user:password@host:port/database)

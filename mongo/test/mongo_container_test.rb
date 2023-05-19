@@ -44,11 +44,6 @@ class MongoContainerTest < TestcontainersTest
     assert @container.mapped_port(27017)
   end
 
-  def test_it_supports_custom_port
-    container = Testcontainers::MongoContainer.new(port: 13306)
-    assert_equal 13306, container.port
-  end
-
   def test_it_supports_custom_keyword_arguments
     container = Testcontainers::MongoContainer.new(filesystem_binds: ["#{Dir.pwd}/custom/conf:/etc/mongo/mongod.conf:rw"])
     assert_equal ["#{Dir.pwd}/custom/conf:/etc/mongo/mongod.conf:rw"], container.filesystem_binds
