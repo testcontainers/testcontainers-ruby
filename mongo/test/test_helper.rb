@@ -3,7 +3,6 @@ require "testcontainers/mongo"
 
 require "minitest/autorun"
 require "minitest/hooks/test"
-require "mongo"
 
 class TestcontainersTest < Minitest::Test
   include Minitest::Hooks

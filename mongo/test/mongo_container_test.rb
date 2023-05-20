@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "mongo"
 
 class MongoContainerTest < TestcontainersTest
   def before_all
@@ -26,8 +27,8 @@ class MongoContainerTest < TestcontainersTest
   end
 
   def test_it_supports_custom_image
-    container = Testcontainers::MongoContainer.new("mariadb:latest")
-    assert_equal "mariadb:latest", container.image
+    container = Testcontainers::MongoContainer.new("bitnami/mongodb:latest")
+    assert_equal "bitnami/mongodb:latest", container.image
   end
 
   def test_it_returns_the_default_port

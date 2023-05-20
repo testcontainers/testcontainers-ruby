@@ -4,7 +4,6 @@ require "testcontainers"
 module Testcontainers
   # MongoContainer class is used to manage containers that runs a Mongo databese
   #
-  # @attr_reader [String] port used by container
   # @attr_reader [String] username used by the container
   # @attr_reader [String] password used by the container
   # @attr_reader [String] database used by the container
@@ -17,7 +16,6 @@ module Testcontainers
 
     MONGO_DEFAULT_USERNAME = "test"
     MONGO_DEFAULT_PASSWORD = "test"
-    MONGO_DEFAULT_ROOT_USERNAME = "root"
     MONGO_DEFAULT_DATABASE = "test"
 
     attr_reader :username, :password, :database
@@ -55,6 +53,7 @@ module Testcontainers
     end
 
     # Returns the database url (e.g. mongodb://user:password@host:port/database)
+    #
     # @param protocol [String] the protocol to use in the string (default: "mongodb")
     # @param database [String] the database to use in the string (default: @database)
     # @param options [Hash] the options to use in the query string (default: {})
@@ -70,7 +69,10 @@ module Testcontainers
       "#{protocol}://#{username}:#{password}@#{host}:#{mapped_port(port)}/#{database}#{query_string}"
     end
 
+    alias_method :database_url, :mongo_url
+
     # Sets the database to use
+    #
     # @param database [String] the database to use
     # @return [MongoContainer] self
     def with_database(database)
