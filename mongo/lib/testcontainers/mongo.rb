@@ -34,6 +34,8 @@ module Testcontainers
       @username = username || ENV.fetch("MONGO_USERNAME", MONGO_DEFAULT_USERNAME)
       @password = password || ENV.fetch("MONGO_PASSWORD", MONGO_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("MONGO_DATABASE", MONGO_DEFAULT_DATABASE)
+      @healthcheck ||= add_healthcheck(_default_healthcheck_options)
+      @wait_for ||= add_wait_for(:healthcheck)
     end
 
     # Starts the container
@@ -104,6 +106,10 @@ module Testcontainers
       add_env("MONGO_INITDB_DATABASE", @database)
       add_env("MONGO_INITDB_ROOT_USERNAME", @username)
       add_env("MONGO_INITDB_ROOT_PASSWORD", @password)
+    end
+
+    def _default_healthcheck_options
+      {test: ["mongosh", "--eval", "db.adminCommand('ping')"], interval: 5, timeout: 5, retries: 3}
     end
   end
 end

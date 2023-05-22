@@ -71,9 +71,7 @@ class MongoContainerTest < TestcontainersTest
   end
 
   def test_it_is_reachable
-    @container.wait_for_logs(/Waiting for connections/)
-
-    client = Mongo::Client.new("mongodb://test:test@127.0.0.1:#{@port}/test", auth_source: "admin")
+    client = Mongo::Client.new("mongodb://test:test@#{@host}:#{@port}/test", auth_source: "admin")
     client[:artists].insert_one({name: "FKA Twigs"})
 
     assert_equal 1, client[:artists].find(name: "FKA Twigs").count_documents
