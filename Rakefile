@@ -6,7 +6,7 @@ require "rake/testtask"
 require "yard"
 require "standard/rake"
 
-MODULES = %w[core mysql redis postgres nginx elasticsearch mariadb mongo]
+MODULES = %w[core mysql redis postgres nginx elasticsearch mariadb mongo redpanda]
 
 %w[test standard].each do |task_name|
   desc "Run #{task_name} task for all projects"
