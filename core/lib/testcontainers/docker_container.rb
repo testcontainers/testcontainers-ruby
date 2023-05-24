@@ -899,15 +899,15 @@ module Testcontainers
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @return [self]
     def copy_file_to_container(container_path, host_path_or_io)
-      raise ContainerNotStartedError, 'Container has not been started' unless running?
-      raise ArgumentError, 'Container path must be a non-empty string' if container_path.to_s.empty?
+      raise ContainerNotStartedError, "Container has not been started" unless running?
+      raise ArgumentError, "Container path must be a non-empty string" if container_path.to_s.empty?
 
       begin
         io = host_path_or_io.is_a?(String) ? File.open(host_path_or_io) : host_path_or_io
         io.rewind if io.pos != 0
         store_file(container_path, io.read)
         io.rewind
-      rescue StandardError => e
+      rescue => e
         puts "Error while copying file to container: #{e.message}"
         return false
       ensure
@@ -925,8 +925,8 @@ module Testcontainers
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @return [String] The contents of the file inside the container.
     def copy_file_from_container(container_path, host_path_or_io)
-      raise ContainerNotStartedError, 'Container has not been started' unless running?
-      raise ArgumentError, 'Container path must be a non-empty string' if container_path.to_s.empty?
+      raise ContainerNotStartedError, "Container has not been started" unless running?
+      raise ArgumentError, "Container path must be a non-empty string" if container_path.to_s.empty?
 
       begin
         io = host_path_or_io.is_a?(String) ? File.open(host_path_or_io, "w") : host_path_or_io
@@ -934,7 +934,7 @@ module Testcontainers
         content = read_file(container_path)
         io.write(content)
         io.rewind
-      rescue StandardError => e
+      rescue => e
         puts "Error while copying file from container: #{e.message}"
         raise e # Optionally re-raise the exception or handle it according to your needs
       ensure

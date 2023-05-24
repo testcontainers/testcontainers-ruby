@@ -403,7 +403,6 @@ class DockerContainerTest < TestcontainersTest
     @long_running_container.copy_file_from_container("/etc/alpine-release", io)
 
     assert_match(/\d+\.\d+\.\d+/, io.string.chomp)
-
   ensure
     @long_running_container.stop! if @long_running_container.running?
   end
