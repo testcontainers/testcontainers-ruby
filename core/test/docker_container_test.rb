@@ -196,6 +196,7 @@ class DockerContainerTest < TestcontainersTest
     container = Testcontainers::DockerContainer.new("hello-world")
       .with(name: "foobar")
       .with(command: %w[tail -f /dev/null])
+      .with(entrypoint: %w[sh -c])
       .with(exposed_ports: ["80/tcp", 443])
       .with(fixed_exposed_port: {80 => 8080})
       .with(volumes: ["/tmp"])
@@ -207,6 +208,7 @@ class DockerContainerTest < TestcontainersTest
 
     assert_equal("foobar", container.name)
     assert_equal(%w[tail -f /dev/null], container.command)
+    assert_equal(%w[sh -c], container.entrypoint)
     assert_equal({"80/tcp" => {}, "443/tcp" => {}}, container.exposed_ports)
     assert_equal({"80/tcp" => [{"HostPort" => "8080"}], "443/tcp" => [{"HostPort" => ""}]}, container.port_bindings)
     assert_equal({"/tmp" => {}, "/root" => {}}, container.volumes)

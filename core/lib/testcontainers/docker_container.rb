@@ -6,6 +6,7 @@ module Testcontainers
   # @attr name [String] the container's name
   # @attr image [String] the container's image name
   # @attr command [Array<String>, nil] the command to run in the container
+  # @attr entrypoint [Array<String>, nil] the entrypoint to run in the container
   # @attr exposed_ports [Hash, nil] a hash mapping exposed container ports to an empty hash (used for Docker API compatibility)
   # @attr port_bindings [Hash, nil] a hash mapping container ports to host port bindings (used for Docker API compatibility)
   # @attr volumes [Hash, nil] a hash mapping volume paths in the container to an empty hash (used for Docker API compatibility)
@@ -18,7 +19,7 @@ module Testcontainers
   # @attr_reader _container [Docker::Container, nil] the underlying Docker::Container object
   # @attr_reader _id [String, nil] the container's ID
   class DockerContainer
-    attr_accessor :name, :image, :command, :exposed_ports, :port_bindings, :volumes, :filesystem_binds,
+    attr_accessor :name, :image, :command, :entrypoint, :exposed_ports, :port_bindings, :volumes, :filesystem_binds,
       :env, :labels, :working_dir, :healthcheck, :wait_for
     attr_accessor :logger
     attr_reader :_container, :_id
@@ -36,12 +37,13 @@ module Testcontainers
     # @param labels [Hash, nil] a hash of labels to be applied to the container
     # @param working_dir [String, nil] the working directory for the container
     # @param logger [Logger] a logger instance for the container
-    def initialize(image, command: nil, name: nil, exposed_ports: nil, port_bindings: nil, volumes: nil, filesystem_binds: nil, env: nil,
-      labels: nil, working_dir: nil, healthcheck: nil, wait_for: nil, logger: Testcontainers.logger)
+    def initialize(image, name: nil, command: nil, entrypoint: nil, exposed_ports: nil, port_bindings: nil, volumes: nil, filesystem_binds: nil,
+      env: nil, labels: nil, working_dir: nil, healthcheck: nil, wait_for: nil, logger: Testcontainers.logger)
 
       @image = image
-      @command = command
       @name = name
+      @command = command
+      @entrypoint = entrypoint
       @exposed_ports = add_exposed_ports(exposed_ports) if exposed_ports
       @port_bindings = add_fixed_exposed_ports(port_bindings) if port_bindings
       @volumes = add_volumes(volumes) if volumes
@@ -312,6 +314,16 @@ module Testcontainers
     # @return [DockerContainer] The updated DockerContainer instance.
     def with_command(*parts)
       @command = parts.first.is_a?(Array) ? parts.first : parts
+
+      self
+    end
+
+    # Set the entrypoint for the container.
+    #
+    # @param parts [Array<String>] The entry point for the container as an array of strings.
+    # @return [DockerContainer] The updated DockerContainer instance.
+    def with_entrypoint(*parts)
+      @entrypoint = parts.first.is_a?(Array) ? parts.first : parts
 
       self
     end
@@ -1081,6 +1093,7 @@ module Testcontainers
         "name" => @name,
         "Image" => @image,
         "Cmd" => @command,
+        "Entrypoint" => @entrypoint,
         "ExposedPorts" => @exposed_ports,
         "Volumes" => @volumes,
         "Env" => @env,
