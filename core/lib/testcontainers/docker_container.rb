@@ -879,6 +879,81 @@ module Testcontainers
       File.exist?("/.dockerenv")
     end
 
+    # Copies a IO object or a file from the host to the container.
+    #
+    # @param container_path [String] The path to the file inside the container.
+    # @param host_path_or_io [String, IO] The path to the file on the host or a IO object.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @return [self]
+    def copy_file_to_container(container_path, host_path_or_io)
+      raise ContainerNotStartedError, 'Container has not been started' unless running?
+      raise ArgumentError, 'Container path must be a non-empty string' if container_path.to_s.empty?
+
+      begin
+        io = host_path_or_io.is_a?(String) ? File.open(host_path_or_io) : host_path_or_io
+        io.rewind if io.pos != 0
+        store_file(container_path, io.read)
+        io.rewind
+      rescue StandardError => e
+        puts "Error while copying file to container: #{e.message}"
+        return false
+      ensure
+        io.close if io.respond_to?(:close)
+      end
+
+      true
+    end
+
+    # Copies a file from the container to the host.
+    #
+    # @param container_path [String] The path to the file inside the container.
+    # @param host_path_or_io [String, IO] The path to the file on the host or a IO object.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @return [String] The contents of the file inside the container.
+    def copy_file_from_container(container_path, host_path_or_io)
+      raise ContainerNotStartedError, 'Container has not been started' unless running?
+      raise ArgumentError, 'Container path must be a non-empty string' if container_path.to_s.empty?
+
+      begin
+        io = host_path_or_io.is_a?(String) ? File.open(host_path_or_io, "w") : host_path_or_io
+        io.rewind if io.pos != 0
+        content = read_file(container_path)
+        io.write(content)
+        io.rewind
+      rescue StandardError => e
+        puts "Error while copying file from container: #{e.message}"
+        raise e # Optionally re-raise the exception or handle it according to your needs
+      ensure
+        io.close if io.respond_to?(:close)
+      end
+
+      content
+    end
+
+    # Reads the contents of a file inside the container.
+    #
+    # @param path [String] The path to the file.
+    # @return [String] The contents of the file.
+    def read_file(path)
+      raise ContainerNotStartedError unless @_container
+
+      @_container.read_file(path)
+    end
+
+    # Writes the contents of a file inside the container.
+    #
+    # @param path [String] The path to the file.
+    # @param contents [String] The contents of the file.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    def store_file(path, contents)
+      raise ContainerNotStartedError unless @_container
+
+      @_container.store_file(path, contents)
+    end
+
     private
 
     def normalize_ports(ports)

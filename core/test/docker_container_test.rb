@@ -363,4 +363,60 @@ class DockerContainerTest < TestcontainersTest
   ensure
     @long_running_container.stop! if @long_running_container.running?
   end
+
+  def test_it_copies_files_to_container_using_an_io_object
+    @long_running_container.start
+    @long_running_container.copy_file_to_container("/tmp/README.md", StringIO.new("Hello world!"))
+
+    stdout, _, exit_code = @long_running_container.exec(%w[cat /tmp/README.md])
+
+    assert_equal "Hello world!", stdout.join.chomp
+    assert_equal 0, exit_code
+  ensure
+    @long_running_container.stop! if @long_running_container.running?
+  end
+
+  def test_it_copies_files_to_container_using_an_filepath
+    tempfile = Tempfile.new("test")
+    tempfile.write("Hello world from tempfile!")
+    tempfile.close
+
+    @long_running_container.start
+    @long_running_container.copy_file_to_container("/tmp/README.md", tempfile.path)
+
+    stdout, _, exit_code = @long_running_container.exec(%w[cat /tmp/README.md])
+
+    assert_equal "Hello world from tempfile!", stdout.join.chomp
+    assert_equal 0, exit_code
+  ensure
+    @long_running_container.stop! if @long_running_container.running?
+    tempfile.unlink
+    tempfile.close
+  end
+
+  def test_it_copies_files_from_container_using_an_io_object
+    io = StringIO.new
+
+    @long_running_container.start
+    @long_running_container.copy_file_from_container("/etc/alpine-release", io)
+
+    assert_match(/\d+\.\d+\.\d+/, io.string.chomp)
+
+  ensure
+    @long_running_container.stop! if @long_running_container.running?
+  end
+
+  def test_it_copies_files_from_container_using_a_filepath
+    tempfile = Tempfile.new("test")
+    tempfile.close
+
+    @long_running_container.start
+    @long_running_container.copy_file_from_container("/etc/alpine-release", tempfile.path)
+
+    assert_match(/\d+\.\d+\.\d+/, File.read(tempfile.path).chomp)
+  ensure
+    @long_running_container.stop! if @long_running_container.running?
+    tempfile.unlink
+    tempfile.close
+  end
 end
