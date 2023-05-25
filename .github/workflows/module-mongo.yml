@@ -1,4 +1,4 @@
-name: Modules: MongoDB tests
+name: "Modules: MongoDB tests"
 
 on:
   push:

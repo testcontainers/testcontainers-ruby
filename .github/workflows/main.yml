@@ -1,4 +1,4 @@
-name: Ruby CI: Style Checks with Standard
+name: "Ruby CI: Style Checks with Standard"
 
 on:
   push:

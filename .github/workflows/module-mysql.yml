@@ -1,4 +1,4 @@
-name: Modules: MySQL tests
+name: "Modules: MySQL tests"
 
 on:
   push:

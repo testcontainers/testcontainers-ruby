@@ -1,4 +1,4 @@
-name: Modules: Postgres tests
+name: "Modules: Postgres tests"
 
 on:
   push:

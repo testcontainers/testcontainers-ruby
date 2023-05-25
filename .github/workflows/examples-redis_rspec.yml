@@ -1,4 +1,4 @@
-name: Examples: Redis module (RSpec)
+name: "Examples: Redis module (RSpec)"
 
 on:
   push:

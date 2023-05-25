@@ -1,4 +1,4 @@
-name: Examples: Core module with Memcached (RSpec)
+name: "Examples: Core module with Memcached (RSpec)"
 
 on:
   push:

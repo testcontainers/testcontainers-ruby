@@ -1,4 +1,4 @@
-name: Examples: MySQL module (ActiveRecord + RSpec)
+name: "Examples: MySQL module (ActiveRecord + RSpec)"
 
 on:
   push:
