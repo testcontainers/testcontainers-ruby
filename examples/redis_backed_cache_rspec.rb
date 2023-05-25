@@ -34,6 +34,7 @@ RSpec.configure do |config|
     config.redis = Testcontainers::DockerContainer.new("redis:6.2-alpine").with_exposed_ports("6379")
     config.redis.start
     config.redis.wait_for_tcp_port("6379") # wait for Redis to start
+    config.redis.wait_for_logs(/Ready to accept connections/)
   end
 
   config.after(:suite) do
