@@ -1,4 +1,4 @@
-name: Core module example for Redis (Minitest)
+name: Redis module example (RSpec)
 
 on:
   push:
@@ -25,4 +25,4 @@ jobs:
         bundler-cache: true
     - name: Run the example
       working-directory: ./examples
-      run: ruby redis_backed_cache_minitest.rb
+      run: ruby redis_container_rspec.rb
