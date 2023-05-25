@@ -1,4 +1,4 @@
-name: "Ruby CI: Style Checks with Standard"
+name: "Modules: MariaDB tests"
 
 on:
   push:
@@ -23,5 +23,12 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+    - name: Install development dependencies
+      working-directory: ./mariadb
+      run: bundle install
+    - name: Run the tests
+      working-directory: ./mariadb
+      run: bundle exec rake test
     - name: Run standard code style checks
+      working-directory: ./mariadb
       run: bundle exec rake standard

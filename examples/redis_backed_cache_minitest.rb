@@ -38,6 +38,7 @@ class RedisBackedCacheTest < Minitest::Test
     @redis_container = Testcontainers::DockerContainer.new("redis:6.2-alpine").with_exposed_ports(6379)
     @redis_container.start
     @redis_container.wait_for_tcp_port(6379)
+    @redis_container.wait_for_logs(/Ready to accept connections/)
   end
 
   def after_all

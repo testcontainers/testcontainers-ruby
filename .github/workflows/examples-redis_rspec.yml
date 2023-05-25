@@ -1,4 +1,4 @@
-name: "Ruby CI: Style Checks with Standard"
+name: "Examples: Redis module (RSpec)"
 
 on:
   push:
@@ -23,5 +23,6 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - name: Run standard code style checks
-      run: bundle exec rake standard
+    - name: Run the example
+      working-directory: ./examples
+      run: ruby redis_container_rspec.rb
