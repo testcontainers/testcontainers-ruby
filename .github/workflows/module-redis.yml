@@ -23,6 +23,9 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+    - name: Install development dependencies
+      working-directory: ./core
+      run: bundle install
     - name: Run the tests
       working-directory: ./redis
       run: bundle exec rake test
