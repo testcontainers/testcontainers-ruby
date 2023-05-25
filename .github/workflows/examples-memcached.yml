@@ -1,4 +1,4 @@
-name: Core module example for Memcached (RSpec)
+name: Examples: Core module with Memcached (RSpec)
 
 on:
   push:

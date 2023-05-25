@@ -1,4 +1,4 @@
-name: ElasticSearch module tests
+name: Modules: ElasticSearch tests
 
 on:
   push:

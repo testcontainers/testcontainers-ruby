@@ -1,4 +1,4 @@
-name: MariaDB module tests
+name: Modules: MariaDB tests
 
 on:
   push:

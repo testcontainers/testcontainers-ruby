@@ -1,4 +1,4 @@
-name: Core module tests
+name: Modules: Core tests
 
 on:
   push:

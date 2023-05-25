@@ -1,4 +1,4 @@
-name: Nginx module tests
+name: Modules: Nginx tests
 
 on:
   push:
