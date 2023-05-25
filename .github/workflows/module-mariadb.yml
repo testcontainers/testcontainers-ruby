@@ -1,0 +1,34 @@
+name: MariaDB module tests
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Ruby ${{ matrix.ruby }}
+    strategy:
+      matrix:
+        ruby:
+          - '3.2.0'
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Install development dependencies
+      working-directory: ./mariadb
+      run: bundle install
+    - name: Run the tests
+      working-directory: ./mariadb
+      run: bundle exec rake test
+    - name: Run standard code style checks
+      working-directory: ./mariadb
+      run: bundle exec rake standard
