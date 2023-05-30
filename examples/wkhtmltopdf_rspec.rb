@@ -21,6 +21,7 @@ describe 'Wkhtmltopdf Example' do
   let(:container) do
     Testcontainers::DockerContainer.new('surnet/alpine-wkhtmltopdf:3.17.0-0.12.6-small')
   end
+  let(:file_path) { __dir__ + file_name }
 
   before do
     container.with_filesystem_binds([pdfs_path])
@@ -34,6 +35,6 @@ describe 'Wkhtmltopdf Example' do
   end
 
   it 'generates a PDF page from URL' do
-    expect(File.file?(__dir__ + file_name)).to be_truthy
+    expect(File).to exist(file_path)
   end
 end
