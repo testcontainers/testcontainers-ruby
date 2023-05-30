@@ -6,4 +6,6 @@
 /pkg/
 /spec/reports/
 /tmp/
+/examples/pdfs/*.pdf
 *.gem
+.DS_Store
