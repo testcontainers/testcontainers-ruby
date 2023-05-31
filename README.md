@@ -48,23 +48,23 @@ For a more detailed example, please refer to the Quickstart Guide under the docs
 
 Tescontainers contains modules that can be used instead of the generic
 DockerContainer for common databases and services, providing
-pre-configured setups and reducing the amount of boilerplate code.
+pre-configured setups and reducing the amount of boilerplate code:
 
-[ElasticsearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/elasticsearch)
+- [ElasticsearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/elasticsearch)
 
-[MariadbContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mariadb)
+- [MariadbContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mariadb)
 
-[MongoContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mongo)
+- [MongoContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mongo)
 
-[MysqlContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mysql)
+- [MysqlContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mysql)
 
-[NginxContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/nginx)
+- [NginxContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/nginx)
 
-[PostgresContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/postgres)
+- [PostgresContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/postgres)
 
-[RedisContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redis)
+- [RedisContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redis)
 
-[RedpandaContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redpanda)
+- [RedpandaContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redpanda)
 
 
 
