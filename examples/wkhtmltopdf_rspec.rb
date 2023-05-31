@@ -26,9 +26,9 @@ end
 
 describe "Wkhtmltopdf Example" do
   let(:url) { "https://getbootstrap.com/docs/5.3/examples/sticky-footer/" }
-  let(:pdfs_path) { "#{__dir__}/pdfs:/pdfs:rw" }
+  let(:pdfs_path) { "#{__dir__}/tmp:/tmp:rw" }
   let(:command) { [url, file_name] }
-  let(:file_name) { "/pdfs/document.pdf" }
+  let(:file_name) { "/tmp/document.pdf" }
   let(:file_path) { "#{__dir__}#{file_name}" }
   let(:container) do
     Testcontainers::DockerContainer.new("surnet/alpine-wkhtmltopdf:3.17.0-0.12.6-small")
