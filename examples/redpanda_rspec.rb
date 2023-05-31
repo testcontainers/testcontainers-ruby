@@ -34,11 +34,11 @@ RSpec.describe "Redpanda" do
       "auto.offset.reset": "earliest"
     }
 
-    consumer = Rdkafka::Config.new(config).consumer
-    consumer.subscribe("ruby-test-topic")
-
     producer = Rdkafka::Config.new(config).producer
     producer.produce(payload: "test", topic: "ruby-test-topic").wait
+
+    consumer = Rdkafka::Config.new(config).consumer
+    consumer.subscribe("ruby-test-topic")
 
     consumer.each do |message|
       expect(message.payload).to eq("test")
