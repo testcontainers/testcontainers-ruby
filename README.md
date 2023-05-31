@@ -44,6 +44,30 @@ container.delete
 
 For a more detailed example, please refer to the Quickstart Guide under the docs folder.
 
+### Included modules
+
+Tescontainers contains modules that can be used instead of the generic
+DockerContainer for common databases and services, providing
+pre-configured setups and reducing the amount of boilerplate code.
+
+[ElasticsearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/elasticsearch)
+
+[MariadbContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mariadb)
+
+[MongoContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mongo)
+
+[MysqlContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mysql)
+
+[NginxContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/nginx)
+
+[PostgresContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/postgres)
+
+[RedisContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redis)
+
+[RedpandaContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redpanda)
+
+
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
