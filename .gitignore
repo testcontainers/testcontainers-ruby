@@ -9,3 +9,4 @@
 /examples/pdfs/*.pdf
 *.gem
 .DS_Store
+.tool-versions
