@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Testcontainers for Ruby: Nginx module"
   spec.description = "Testcontainers makes it easy to create and clean up container-based dependencies for automated tests."
-  spec.homepage = "https://github.com/guilleiguaran/testcontainers-ruby"
+  spec.homepage = "https://github.com/testcontainers/testcontainers-ruby"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
 
