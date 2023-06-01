@@ -47,6 +47,12 @@ PATH
       testcontainers-core (~> 0.1.2)
 
 PATH
+  remote: rabbitmq
+  specs:
+    testcontainers-rabbitmq (0.1.0)
+      testcontainers-core (~> 0.1.2)
+
+PATH
   remote: redis
   specs:
     testcontainers-redis (0.1.1)
@@ -61,8 +67,12 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    amq-protocol (2.3.2)
     ast (2.4.2)
     bson (4.15.0)
+    bunny (2.20.3)
+      amq-protocol (~> 2.3, >= 2.3.1)
+      sorted_set (~> 1, >= 1.0.2)
     connection_pool (2.4.0)
     docker-api (2.2.0)
       excon (>= 0.47.0)
@@ -102,6 +112,7 @@ GEM
       ffi (~> 1.15)
       mini_portile2 (~> 2.6)
       rake (> 12)
+    rbtree (0.4.6)
     redis (5.0.6)
       redis-client (>= 0.9.0)
     redis-client (0.14.1)
@@ -125,6 +136,10 @@ GEM
       rubocop-ast (>= 0.4.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
+    set (1.0.3)
+    sorted_set (1.0.3)
+      rbtree
+      set (~> 1.0)
     standard (1.28.2)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -145,6 +160,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  bunny (>= 2.19.0)
   elasticsearch (~> 8.7)
   minitest (~> 5.0)
   minitest-hooks (~> 1.5)
@@ -163,6 +179,7 @@ DEPENDENCIES
   testcontainers-mysql!
   testcontainers-nginx!
   testcontainers-postgres!
+  testcontainers-rabbitmq!
   testcontainers-redis!
   testcontainers-redpanda!
   yard (~> 0.9)
