@@ -10,7 +10,7 @@ class RabbitmqContainerTest < TestcontainersTest
     @container = Testcontainers::RabbitmqContainer.new
     @container.start
     @host = @container.host
-    @port = @container.first_queue_mapped_port
+    @port = @container.first_mapped_port
   end
 
   def after_all
@@ -27,22 +27,22 @@ class RabbitmqContainerTest < TestcontainersTest
   end
 
   def test_it_supports_custom_image
-    container = Testcontainers::RabbitmqContainer.new("mariadb:latest")
-    assert_equal "mariadb:latest", container.image
+    container = Testcontainers::RabbitmqContainer.new("rabbitmq:management")
+    assert_equal "rabbitmq:management", container.image
   end
 
-  def test_it_returns_the_default_port_to_enqueue_messages
-    assert_equal 5672, @container.queue_port
+  def test_it_returns_the_default_port_for_queues
+    assert_equal 5672, @container.port
   end
 
-  def test_it_returns_the_default_port_to_add_plugins
-    assert_equal 15672, @container.plugins_port
+  def test_it_returns_the_default_port_for_management_ui
+    assert_equal 15672, @container.management_ui_port
   end
 
   def test_it_is_configured_with_the_default_environment_variables
-    assert "test", @container.get_env("RABBITMQ_DEFAULT_VHOST")
-    assert "test", @container.get_env("RABBITMQ_DEFAULT_USER")
-    assert "test", @container.get_env("RABBITMQ_DEFAULT_PASSWORD")
+    assert_equal "rabbitmq", @container.get_env("RABBITMQ_DEFAULT_USER")
+    assert_equal "rabbitmq", @container.get_env("RABBITMQ_DEFAULT_PASS")
+    assert_equal "/", @container.get_env("RABBITMQ_DEFAULT_VHOST")
   end
 
   def test_it_has_the_default_port_mapped
@@ -50,33 +50,37 @@ class RabbitmqContainerTest < TestcontainersTest
   end
 
   def test_it_supports_custom_keyword_arguments
-    container = Testcontainers::RabbitmqContainer.new(filesystem_binds: ["#{Dir.pwd}/custom/conf:/var/lib/postgresql/data/postgresql.conf:rw"])
-    assert_equal ["#{Dir.pwd}/custom/conf:/var/lib/postgresql/data/postgresql.conf:rw"], container.filesystem_binds
+    container = Testcontainers::RabbitmqContainer.new(env: {"RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS" => "foo"})
+    assert_equal "foo", container.get_env("RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS")
   end
 
   def test_it_returns_the_default_rabbitmq_url
-    assert_equal "amqp://test:test@#{@host}:#{@port}/test", @container.rabbitmq_url
+    assert_equal "amqp://rabbitmq:rabbitmq@#{@host}:#{@port}", @container.rabbitmq_url
   end
 
   def test_it_returns_the_rabbitmq_url_with_custom_vhost
-    assert_equal "amqp://test:test@#{@host}:#{@port}/foo", @container.rabbitmq_url(vhost: "foo")
+    assert_equal "amqp://rabbitmq:rabbitmq@#{@host}:#{@port}/foo", @container.rabbitmq_url(vhost: "foo")
+  end
+
+  def test_it_returns_the_rabbitmq_url_with_custom_vhost_with_slash
+    assert_equal "amqp://rabbitmq:rabbitmq@#{@host}:#{@port}/bar", @container.rabbitmq_url(vhost: "/bar")
   end
 
   def test_it_returns_the_rabbitmq_url_with_custom_protocol
-    assert_equal "amqps://test:test@#{@host}:#{@port}/test", @container.rabbitmq_url(protocol: "amqps")
+    assert_equal "amqps://rabbitmq:rabbitmq@#{@host}:#{@port}", @container.rabbitmq_url(protocol: "amqps://")
   end
 
   def test_it_returns_the_rabbitmq_url_with_custom_username
-    assert_equal "amqp://foo:test@#{@host}:#{@port}/test", @container.rabbitmq_url(username: "foo")
+    assert_equal "amqp://foo:rabbitmq@#{@host}:#{@port}", @container.rabbitmq_url(username: "foo")
   end
 
   def test_it_returns_the_rabbitmq_url_with_custom_password
-    assert_equal "amqp://test:bar@#{@host}:#{@port}/test", @container.rabbitmq_url(password: "bar")
+    assert_equal "amqp://rabbitmq:bar@#{@host}:#{@port}", @container.rabbitmq_url(password: "bar")
   end
 
   def test_it_is_reachable
     @container.wait_for_logs(/Ready to start client connection listeners/)
-    connection = Bunny.new(host: @host, port: @port, user: "test", pass: "test", vhost: "test")
+    connection = Bunny.new(@container.rabbitmq_url)
     connection.start
     channel = connection.create_channel
     queue = channel.queue("hello")
