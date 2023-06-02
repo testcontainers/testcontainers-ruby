@@ -11,9 +11,10 @@ module Testcontainers
   class RabbitmqContainer < ::Testcontainers::DockerContainer
     # Default ports used by the container
     RABBITMQ_QUEUE_DEFAULT_PORT = 5672
-    RABBITMQ_PLUGINS_DEFAULT_PORT = 15672
+    RABBITMQ_MGMT_UI_DEFAULT_PORT = 15672
 
     # Default image used by the container
+    # To have the management plugin enabled, use the image with the tag "management"
     RABBITMQ_DEFAULT_IMAGE = "rabbitmq:latest"
     RABBITMQ_DEFAULT_USER = "test"
     RABBITMQ_DEFAULT_PASS = "test"
@@ -41,26 +42,27 @@ module Testcontainers
     #
     # @return [RabbitmqContainer] self
     def start
-      with_exposed_ports([queue_port, plugins_port])
+      with_exposed_ports([port, management_ui_port])
       _configure
       super
     end
 
-    # Returns the port used to connect to the container to enqueue messages
+    # Returns the port used to connect to the container queue
     #
     # @return [Integer] the port used by the container
-    def queue_port
+    def port
       RABBITMQ_QUEUE_DEFAULT_PORT
     end
 
-    # Returns the port used to connect to the container to add_plugins
+    # Returns the port used to connect to the container management UI
+    # This is available only if an image with the management plugin enabled is used
     #
     # @return [Integer] the port used by the container
-    def plugins_port
-      RABBITMQ_PLUGINS_DEFAULT_PORT
+    def management_ui_port
+      RABBITMQ_MGMT_UI_DEFAULT_PORT
     end
 
-    # Returns the rabbitmq url (e.g. mysql://user:password@host:port/database)
+    # Returns the rabbitmq connection url (e.g. amqp://user:password@host:port/vhost)
     #
     # @param protocol [String] the protocol to use in the string (default: "mysql")
     # @param database [String] the database to use in the string (default: @database)
@@ -68,13 +70,26 @@ module Testcontainers
     # @return [String] the rabbitmq url
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [ContainerNotStartedError] If the container has not been started.
-    def rabbitmq_url(protocol: "amqp", username: nil, password: nil, vhost: nil)
+    def rabbitmq_url(protocol: "amqp://", username: nil, password: nil, vhost: nil)
       username ||= @username
       password ||= @password
       vhost ||= @vhost
 
       # amqp://user:pass@host:10000/vhost
-      "#{protocol}://#{username}:#{password}@#{host}:#{mapped_port(queue_port)}/#{vhost}"
+      "#{protocol}#{username}:#{password}@#{host}:#{mapped_port(port)}#{vhost}"
+    end
+
+    alias_method :connection_url, :rabbitmq_url
+
+    # Returns the rabbitmq management UI url (e.g. http://user:password@host:port)
+    #
+    # @param protocol [String] the protocol to use in the string (default: "http")
+    # @return [String] the url for the management UI. Returns nil if the management UI is not available.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    def management_ui_url(protocol: "http")
+      port = mapped_port(management_ui_port)
+      port.nil? ? nil : "#{protocol}://#{host}:#{port}"
     end
 
     # Sets the vhost to use
@@ -104,13 +119,13 @@ module Testcontainers
       self
     end
 
-    # Returns the container's first mapped port used to enqueue messages..
+    # Returns the container's first mapped port (the one used by the queue)
     #
     # @return [Integer] The container's first mapped port.
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
-    def first_queue_mapped_port
+    def first_mapped_port
       raise ContainerNotStartedError unless @_container
-      mapped_port(queue_port)
+      mapped_port(port)
     end
 
     private
