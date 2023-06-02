@@ -39,6 +39,8 @@ module Testcontainers
       @username = username || ENV.fetch("RABBITMQ_USER", RABBITMQ_DEFAULT_USER)
       @password = password || ENV.fetch("RABBITMQ_PASSWORD", RABBITMQ_DEFAULT_PASS)
       @vhost = vhost || ENV.fetch("RABBITMQ_VHOST", RABBITMQ_DEFAULT_VHOST)
+      @healthcheck ||= add_healthcheck(_default_healthcheck_options)
+      @wait_for ||= add_wait_for(:healthcheck)
     end
 
     # Starts the container
@@ -139,6 +141,10 @@ module Testcontainers
       add_env("RABBITMQ_DEFAULT_USER", @username)
       add_env("RABBITMQ_DEFAULT_PASS", @password)
       add_env("RABBITMQ_DEFAULT_VHOST", @vhost) if @vhost
+    end
+
+    def _default_healthcheck_options
+      {test: %w[rabbitmqctl node_health_check], interval: 10, timeout: 10, retries: 5}
     end
   end
 end
