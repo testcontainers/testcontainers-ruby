@@ -62,6 +62,8 @@ pre-configured setups and reducing the amount of boilerplate code:
 
 - [PostgresContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/postgres)
 
+- [RabbitmqContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/rabbitmq)
+
 - [RedisContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redis)
 
 - [RedpandaContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redpanda)

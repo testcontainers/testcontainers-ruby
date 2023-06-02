@@ -64,7 +64,7 @@ Once the container is running, you can obtain the connection details using the f
 
 ```ruby
 host = container.host
-port = container.first_queue_mapped_port
+port = container.first_mapped_port
 ```
 
 Or, you can generate a full RabbitMQ URL:
@@ -83,7 +83,7 @@ container.with_password("custom_pass")
 
 ### Example
 
-Here's a complete example of how to use testcontainers-rabbitmq to create a container, connect to it, and push a simple message:
+There are complete examples of how to use testcontainers-rabbitmq to create containers, connects to it, publish and consume simple message:
 
 ```ruby
 require "testcontainers/rabbitmq"
@@ -92,7 +92,7 @@ require "bunny"
 container = Testcontainers::RabbitmqContainer.new
 container.start
 
-connection = Bunny.new(host: container.host, port: container.first_queue_mapped_port, user: "test", pass: "test", vhost: "test")
+connection = Bunny.new(container.rabbitmq_url)
 connection.start
 
 channel = connection.create_channel
@@ -111,7 +111,7 @@ require "bunny"
 container = Testcontainers::RabbitmqContainer.new
 container.start
 
-connection = Bunny.new(host: container.host, port: container.first_queue_mapped_port, user: "test", pass: "test", vhost: "test")
+connection = Bunny.new(container.rabbitmq_url)
 connection.start
 
 channel = connection.create_channel
@@ -128,7 +128,7 @@ The previous example creates a RabbitMQ container, connects to it using `bunny` 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/guilleiguaran/testcontainers. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/guilleiguaran/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/guilleiguaran/testcontainers. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/testcontainers/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -136,4 +136,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Testcontainers project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/guilleiguaran/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Testcontainers project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/testcontainers/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).
