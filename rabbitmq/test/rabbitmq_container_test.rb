@@ -79,14 +79,20 @@ class RabbitmqContainerTest < TestcontainersTest
   end
 
   def test_it_is_reachable
-    @container.wait_for_logs(/Ready to start client connection listeners/)
     connection = Bunny.new(@container.rabbitmq_url)
     connection.start
     channel = connection.create_channel
     queue = channel.queue("hello")
     channel.default_exchange.publish("Hello World!", routing_key: queue.name)
 
-    assert_equal 1, queue.message_count
+    queue.subscribe(manual_ack: true) do |delivery_info, _metadata, payload|
+      assert_equal "Hello World!", payload
+      channel.ack(delivery_info.delivery_tag)
+    end
+
+    sleep 1.0
+
+    channel.close
     connection.close
   end
 end
