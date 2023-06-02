@@ -16,11 +16,15 @@ module Testcontainers
     # Default image used by the container
     # To have the management plugin enabled, use the image with the tag "management"
     RABBITMQ_DEFAULT_IMAGE = "rabbitmq:latest"
-    RABBITMQ_DEFAULT_USER = "test"
-    RABBITMQ_DEFAULT_PASS = "test"
-    RABBITMQ_DEFAULT_VHOST = "test"
 
-    attr_reader :username, :password
+    # Default credentials used by the container
+    RABBITMQ_DEFAULT_USER = "rabbitmq"
+    RABBITMQ_DEFAULT_PASS = "rabbitmq"
+
+    # Default vhost used by the container
+    RABBITMQ_DEFAULT_VHOST = "/"
+
+    attr_reader :username, :password, :vhost
 
     # Initializes a new instance of RabbitMQContainer
     #
@@ -35,7 +39,6 @@ module Testcontainers
       @username = username || ENV.fetch("RABBITMQ_USER", RABBITMQ_DEFAULT_USER)
       @password = password || ENV.fetch("RABBITMQ_PASSWORD", RABBITMQ_DEFAULT_PASS)
       @vhost = vhost || ENV.fetch("RABBITMQ_VHOST", RABBITMQ_DEFAULT_VHOST)
-      @wait_for ||= add_wait_for(:logs, //)
     end
 
     # Starts the container
@@ -74,6 +77,8 @@ module Testcontainers
       username ||= @username
       password ||= @password
       vhost ||= @vhost
+      vhost = "/#{vhost}" unless vhost.start_with?("/")
+      vhost = "" if vhost == "/"
 
       # amqp://user:pass@host:10000/vhost
       "#{protocol}#{username}:#{password}@#{host}:#{mapped_port(port)}#{vhost}"
