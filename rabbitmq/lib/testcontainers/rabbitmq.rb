@@ -15,8 +15,8 @@ module Testcontainers
 
     # Default image used by the container
     RABBITMQ_DEFAULT_IMAGE = "rabbitmq:latest"
-    RABBITMQ_DEFAULT_USER  = "test"
-    RABBITMQ_DEFAULT_PASS  = "test"
+    RABBITMQ_DEFAULT_USER = "test"
+    RABBITMQ_DEFAULT_PASS = "test"
     RABBITMQ_DEFAULT_VHOST = "test"
 
     attr_reader :username, :password
@@ -33,7 +33,7 @@ module Testcontainers
       super(image, **kwargs)
       @username = username || ENV.fetch("RABBITMQ_USER", RABBITMQ_DEFAULT_USER)
       @password = password || ENV.fetch("RABBITMQ_PASSWORD", RABBITMQ_DEFAULT_PASS)
-      @vhost    = vhost    || ENV.fetch("RABBITMQ_VHOST", RABBITMQ_DEFAULT_VHOST)
+      @vhost = vhost || ENV.fetch("RABBITMQ_VHOST", RABBITMQ_DEFAULT_VHOST)
       @wait_for ||= add_wait_for(:logs, //)
     end
 
@@ -71,9 +71,9 @@ module Testcontainers
     def rabbitmq_url(protocol: "amqp", username: nil, password: nil, vhost: nil)
       username ||= @username
       password ||= @password
-      vhost    ||= @vhost
+      vhost ||= @vhost
 
-      #amqp://user:pass@host:10000/vhost
+      # amqp://user:pass@host:10000/vhost
       "#{protocol}://#{username}:#{password}@#{host}:#{mapped_port(queue_port)}/#{vhost}"
     end
 

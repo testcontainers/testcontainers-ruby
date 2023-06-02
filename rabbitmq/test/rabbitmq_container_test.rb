@@ -79,10 +79,10 @@ class RabbitmqContainerTest < TestcontainersTest
     connection = Bunny.new(host: @host, port: @port, user: "test", pass: "test", vhost: "test")
     connection.start
     channel = connection.create_channel
-    queue = channel.queue('hello')
-    channel.default_exchange.publish('Hello World!', routing_key: queue.name)
+    queue = channel.queue("hello")
+    channel.default_exchange.publish("Hello World!", routing_key: queue.name)
 
-    assert_equal 1,  queue.message_count
+    assert_equal 1, queue.message_count
     connection.close
   end
 end
