@@ -5,8 +5,8 @@ require_relative "lib/testcontainers/rabbitmq/version"
 Gem::Specification.new do |spec|
   spec.name = "testcontainers-rabbitmq"
   spec.version = Testcontainers::Rabbitmq::VERSION
-  spec.authors = ["Guillermo Iguaran"]
-  spec.email = ["guilleiguaran@gmail.com"]
+  spec.authors = ["Pedro Piza", "Guillermo Iguaran"]
+  spec.email = ["pedro920224@gmail.com", "guilleiguaran@gmail.com"]
 
   spec.summary = "Testcontainers for Ruby: Rabbitmq module"
   spec.description = "Testcontainers makes it easy to create and clean up container-based dependencies for automated tests."
@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "testcontainers-core", "~> 0.1.2"
+  spec.add_dependency "testcontainers-core", "~> 0.1.3"
 
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "minitest", "~> 5.0"
