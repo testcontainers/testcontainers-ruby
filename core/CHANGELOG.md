@@ -1,6 +1,27 @@
+## [0.1.3] - 2023-06-10
+
+### Added
+
+- Support for entrypoint customization and the DockerContainer#with_entrypoint method
+
+- Methods to read/write strings from and to containers: read_file, store_file
+
+- Methods to copy files from and to containers: copy_file_from_container, copy_file_to_container
+
+- Support for waiting strategies on start
+
+- DockerContainer#with_exposed_port (singular) for convenience
+
+- GenericContainer as alias for DockerContainer
+
+### Fixed
+
+- DockerContainer#add_exposed_ports don't override PortBinding settings added by #add_fixed_exposed_port
+
+
 ## [0.1.2] - 2023-05-13
 
-## Added
+### Added
 
 - DockerContainer#first_mapped_port method returns the first of the
   mapped ports for convenience.
@@ -13,11 +34,11 @@
 
   redis_container.with_healthcheck(test: ["redis-cli ping"], interval: 30, timeout: 30, retries: 3)
 
-## Changed
+### Changed
 
 - DockerContainer#mapped_port(port) method now returns an Integer instead of a String.
 
-## Fixed
+### Fixed
 
 - Links to the GitHub project on the README.md file are fixed.
 
