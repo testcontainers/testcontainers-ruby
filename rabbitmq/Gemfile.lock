@@ -75,7 +75,7 @@ PLATFORMS
   x86_64-darwin-22
 
 DEPENDENCIES
-  bunny (>= 2.19.0)
+  bunny (~> 2.19)
   minitest (~> 5.0)
   minitest-hooks (~> 1.5)
   rake (~> 13.0)
