@@ -7,7 +7,7 @@ PATH
 PATH
   remote: .
   specs:
-    testcontainers-mariadb (0.1.0)
+    testcontainers-mariadb (0.1.1)
       testcontainers-core (~> 0.1.3)
 
 GEM
