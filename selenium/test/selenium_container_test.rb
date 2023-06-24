@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require 'selenium-webdriver'
+require "selenium-webdriver"
 
 class SeleniumContainerTest < TestcontainersTest
   def before_all
@@ -46,7 +46,7 @@ class SeleniumContainerTest < TestcontainersTest
   def test_it_is_configured_with_the_default_environment_variables
     assert "localhost", @container.get_env("no_proxy")
     assert "true", @container.get_env("START_XVFB")
-    assert "localhost",@container.get_env("HUB_ENV_no_proxy")
+    assert "localhost", @container.get_env("HUB_ENV_no_proxy")
   end
 
   def test_it_has_the_default_port_mapped_vnc
@@ -70,22 +70,19 @@ class SeleniumContainerTest < TestcontainersTest
     assert_equal "https://#{@host}:#{@port}/wd/hub", @container.selenium_url(protocol: "https://")
   end
 
-  def  test_it_is_reachable_using_firefox
-    driver = Selenium::WebDriver.for(:firefox, :url => @container.selenium_url)
+  def test_it_is_reachable_using_firefox
+    driver = Selenium::WebDriver.for(:firefox, url: @container.selenium_url)
     driver.navigate.to "https://www.google.com"
 
     assert driver.find_element(class: "gNO89b")
   end
 
-  
-  def  test_it_is_reachable_using_chrome
-    
+  def test_it_is_reachable_using_chrome
     container = Testcontainers::SeleniumContainer.new(capabilities: :chrome)
     container.start
-    driver = Selenium::WebDriver.for(:chrome, :url => container.selenium_url)
+    driver = Selenium::WebDriver.for(:chrome, url: container.selenium_url)
     driver.navigate.to "https://www.google.com"
 
     assert driver.find_element(class: "gNO89b")
   end
-
 end

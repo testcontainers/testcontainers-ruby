@@ -24,7 +24,7 @@ module Testcontainers
     # @param port [String] is use to define the connection port for the container for Selenium
     # @param kwargs [Hash] the options to pass to the container. See {DockerContainer#initialize}
     def initialize(image = nil, capabilities: :firefox, headless: false, vnc_no_password: nil, vnc_password: nil, **kwargs)
-      image = image || SELENIUM_IMAGES[capabilities]
+      image ||= SELENIUM_IMAGES[capabilities]
       super(image, **kwargs)
       @vnc_password = vnc_password
       @vnc_no_password = vnc_no_password
@@ -47,29 +47,32 @@ module Testcontainers
     end
 
     # @return [Integer] the port used by the container of vnc
-   def vnc_port
-     VNC_DEFAULT_PORT
-   end
+    def vnc_port
+      VNC_DEFAULT_PORT
+    end
 
-   # @
-   def selenium_url(protocol: "http://")
-     "#{protocol}#{host}:#{mapped_port(port)}/wd/hub"
-   end
+    # Returns the selenium  connection url (e.g https://host:port/wd/hub)
+    #
+    # @param protocol [String] the protocol to use in the string (default: "http://")
+    # @return [String] the url used by the container
+    def selenium_url(protocol: "http://")
+      "#{protocol}#{host}:#{mapped_port(port)}/wd/hub"
+    end
 
-   private 
+    private
 
-   def _configure
-     if @vnc_no_passsword
-       add_env("SE_VNC_NO_PASSWORD", "1")
-     end
+    def _configure
+      if @vnc_no_passsword
+        add_env("SE_VNC_NO_PASSWORD", "1")
+      end
 
-     if @vnc_password
-       add_env("SE_VNC_PASSWORD", @vnc_password)
-     end 
+      if @vnc_password
+        add_env("SE_VNC_PASSWORD", @vnc_password)
+      end
 
-     add_env("START_XVFB", "#{!@headless}")
-     add_env("no_proxy", "localhost")
-     add_env("HUB_ENV_no_proxy","localhost")
-  end
+      add_env("START_XVFB", (!@headless).to_s)
+      add_env("no_proxy", "localhost")
+      add_env("HUB_ENV_no_proxy", "localhost")
+    end
   end
 end
