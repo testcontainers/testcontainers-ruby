@@ -69,7 +69,7 @@ module Testcontainers
 
     # Returns the rabbitmq connection url (e.g. amqp://user:password@host:port/vhost)
     #
-    # @param protocol [String] the protocol to use in the string (default: "mysql")
+    # @param protocol [String] the protocol to use in the string (default: "amqp://")
     # @param database [String] the database to use in the string (default: @database)
     # @param options [Hash] the options to use in the query string (default: {})
     # @return [String] the rabbitmq url
