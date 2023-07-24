@@ -2,15 +2,22 @@
 
 require "test_helper"
 
+
 class ComposeContainerTest < TestcontainersTest
+
+  TEST_PATH = Dir.getwd
   def before_all
     super
 
-    @container = Testcontainers::ComposeContainer.new
+    @container = Testcontainers::ComposeContainer.new(filepath: TEST_PATH)
     @container.start
+    @container.create
     @host = @container.host
-    binding.pry
     @port = @container.first_mapped_port
+
+    
+    @container.logs
+    binding.pry
   end
 
   def after_all
@@ -30,8 +37,5 @@ class ComposeContainerTest < TestcontainersTest
     container = Testcontainers::ComposeContainer.new(image: "docker/compose")
     assert_equal "docker/compose", container.image
   end
-
-
-
 
 end

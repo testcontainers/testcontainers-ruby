@@ -26,7 +26,7 @@ module Testcontainers
     # @param build [Boolean] is the option for decide if there have to use a build command for the images used for the containers
     # @param env_file [String] is the name of the envieroment configuration
     # @param services [List] are the names of the services that gonna use in the images of the containers 
-    def initialize( image = DOCKER_COMPOSE_IMAGE, filepath: nil, compose_file_name: ["docker-compose.yml"], pull: false, build: false, env_file: nil , services: nil, **kwargs)
+    def initialize( image: DOCKER_COMPOSE_IMAGE, filepath: nil, compose_file_name: ["docker-compose.yml"], pull: false, build: false, env_file: nil , services: nil, **kwargs)
       super(image, **kwargs)
       @filepath = filepath
       @compose_file_names = compose_file_name
@@ -39,7 +39,7 @@ module Testcontainers
     # Specify the names of the all names of the configuration files
     # @return [docker_compose_cmd] 
     def with_command
-      docker_compose_cmd = ['docker compose']
+      docker_compose_cmd = ['docker-compose']
       @compose_file_names.each do |file|
         docker_compose_cmd += ["-f  #{file}"]
       end
@@ -50,7 +50,8 @@ module Testcontainers
     end
 
     # Generete the commands for the containers add the sentences of the function of with_command
-    def start
+    def create
+     binding.pry
       if @pull
         pull_cmd = "#{self.with_command()} pull"
         self.call_command(pull_cmd)
@@ -74,12 +75,21 @@ module Testcontainers
       self.call_command(cmd: down_cmd)
     end
 
+
+    def logs
+      cmd = self.with_command + ["logs"]
+      stdout, stderr , status = Open3.capture3(*cmd, chdir: ".")
+      puts stderr
+      return stdout, stderr, status
+    end
+
     # Execute the commands with multiprocess througt the library Open3
     # @param [List] the commands to be executed   
     def call_command(cmd: nil, filepath: ".")
-      binding.pry
-      Open3.capture2e(*cmd, chdir: filepath)
+     stdout = Open3.capture2e(*cmd, chdir: filepath)
+     p "este es el estado #{stdout}"
     end
+
 
   end
 end
