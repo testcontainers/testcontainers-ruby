@@ -14,8 +14,7 @@ module Testcontainers
   # @attr_accesor [Boolean] build used by the container
   # @attr_accesor [List] services used by the container
   class ComposeContainer
-
-    #Default image used by the container
+    # Default image used by the container
 
     attr_accessor :filepath, :compose_file_name, :pull, :build, :env_file, :services
 
@@ -27,8 +26,8 @@ module Testcontainers
     # @param pull [Boolean] is the option for decide if there should be a pull request to generate the image for the containers
     # @param build [Boolean] is the option for decide if there have to use a build command for the images used for the containers
     # @param env_file [String] is the name of the envieroment configuration
-    # @param services [List] are the names of the services that gonna use in the images of the containers 
-    def initialize(filepath: ".", compose_file_name: ["docker-compose.yml"], pull: false, build: false, env_file: nil , services: nil, **kwargs)
+    # @param services [List] are the names of the services that gonna use in the images of the containers
+    def initialize(filepath: ".", compose_file_name: ["docker-compose.yml"], pull: false, build: false, env_file: nil, services: nil, **kwargs)
       @filepath = filepath
       @compose_file_names = compose_file_name
       @pull = pull
@@ -37,10 +36,10 @@ module Testcontainers
       @env_file = env_file
     end
 
-    # Specify the names of the all names of the configuration files
-    # @return [docker_compose_cmd] 
+    # Specify the names of the all names of the configuration files and if necesary of the env_file for enviorements variables
+    # @return [docker_compose_cmd]
     def with_command
-      docker_compose_cmd = ['docker compose']
+      docker_compose_cmd = ["docker compose"]
       @compose_file_names.each do |file|
         docker_compose_cmd += ["-f  #{file}"]
       end
@@ -50,89 +49,80 @@ module Testcontainers
       docker_compose_cmd.join(" ")
     end
 
-    # Generete the commands for the containers add the sentences of the function of with_command
+    # Generete the commands for the containers add the sentences of the function of with_command  and send them for the subprocess funciontions from Open3
     def start
       if @pull
-        pull_cmd = "#{with_command()} pull"
+        pull_cmd = "#{with_command} pull"
         Open3.capture2(pull_cmd, chdir: @filepath)
       end
 
-      up_cmd =  " #{with_command()} up -d"
+      up_cmd = " #{with_command} up -d"
       if @build
-        up_cmd.concat(' --build')
+        up_cmd.concat(" --build")
       end
 
       if @services
-        up_cmd.concat(@services.join(" "))
-      end
-
-      if @build
-      binding.pry
+        up_cmd.concat(" #{@services.join(" ")}")
       end
 
       Open3.capture2(up_cmd, chdir: @filepath)
     end
 
-    # Generate the command for stop the containers
+    # Generate the command for stop the containers and send them for method of subprocess from Open3
     def stop
-      down_cmd = with_command().concat(' down -v')
-      #call_command(cmd: down_cmd, option: 1)
+      down_cmd = with_command.concat(" down -v")
+      # call_command(cmd: down_cmd, option: 1)
       Open3.capture2(down_cmd, chdir: @filepath)
     end
 
+    # Generate the command for see the logs of the container´s process
     def logs
       command_logs = with_command.concat(" logs")
       Open3.capture3(command_logs, chdir: @filepath)
     end
 
-    def run_in_container(service_name: nil, command: nil )
+    # Generate the command for send a exec process for a container process and send it to a Open3 process
+    # @params service_name [String]
+    # @params command [String]
+    def run_in_container(service_name: nil, command: nil)
       command_exec = with_command.concat(" exec -T #{service_name} #{command}")
       Open3.capture2(command_exec, chdir: @filepath)
     end
 
+    # Confirm the ports number for the service that is in the parameters
+    # @params service [String]
+    # @return port [int]
     def port_process(service: nil, port: 0)
       process_information(service: service, port: port)[0]
     end
 
+    # Return the host that where is located the service that is  in the parameters
+    # @params service [String]
+    # @return host  [String]
     def host_process(service: nil, port: 0)
       process_information(service: service, port: port)[1]
     end
 
-    def process_information(service:nil , port: 0)
-      command_port = with_command().concat(" port #{service} #{port}")
-    # stdout2, stderr2,status2 = call_command(cmd: command_port, option: 3)
-    # stdout2.split(":"), stderr2, status2
-     #stdout_splitted = stdout.split(":")
-     #stdout_splitted, stderr, status
+    # Return the host and the port from the service in a Array
+    # @params service [String]
+    # @return [List]
+    def process_information(service: nil, port: 0)
+      command_port = with_command.concat(" port #{service} #{port}")
       stdout, stderr, status = Open3.capture3(command_port, chdir: @filepath)
-      host, port = stdout.strip.split(':')
+      host, port = stdout.strip.split(":")
       [host, port, stderr, status]
     end
 
-    # Execute the commands with multiprocess througt the library Open3
-    # @param [List] the commands to be executed
-  ##def call_command(cmd: nil, option: 1)
-  ## case option
-  ## when 1
-  ##   stdout, status = Open3.capture2(cmd, chdir: @filepath)
-  ##   return stdout, status
-  ## when 2
-  ##   stdout2, stderr2 = Open3.popen3(cmd, chdir: @filepath)
-  ##   return stdout2, stderr2
-  ## when 3
-  ##   stdout3, stderr3 = Open3.capture3(cmd, chdir: @filepath)
-  ##   return stdout3,stderr3
-  ## else
-  ##   puts "Not command in the  code"
-  ## end
-  ##end
-
+    # Return the response of generate a request to a url to  wich is located in our Docker s service and make a sleep for wait the server complete the build correctly
+    # @params url [String]
+    # @return response [Http]
     def wait_for_request(url: nil)
-      url =URI.parse(url) 
+      sleep 3
+      url = URI.parse(url)
       http = Net::HTTP.new(url.host, url.port)
-
+      http.read_timeout = 5
       request = Net::HTTP::Get.new(url)
-      http.request(request)
+      response = http.request(request)
     end
   end
 end
