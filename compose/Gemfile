@@ -9,4 +9,3 @@ gemspec
 gem "testcontainers-core", path: "../core"
 
 gem "pry-rails"
-
