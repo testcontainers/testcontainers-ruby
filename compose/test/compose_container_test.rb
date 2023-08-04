@@ -110,7 +110,7 @@ class ComposeContainerTest < TestcontainersTest
     ip_address = Socket.ip_address_list.find { |addr| addr.ipv4? && !addr.ipv4_loopback? }.ip_address
     url = "http://#{ip_address}:4444/ui"
     container.wait_for_request(url: url)
-    stdout, stderr = container.logs
+    stdout, _stderr = container.logs
     assert stdout
     container.stop
   end
