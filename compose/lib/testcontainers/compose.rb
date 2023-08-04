@@ -122,7 +122,7 @@ module Testcontainers
       http = Net::HTTP.new(url.host, url.port)
       http.read_timeout = 5
       request = Net::HTTP::Get.new(url)
-      response = http.request(request)
+      http.request(request)
     end
   end
 end

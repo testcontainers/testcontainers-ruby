@@ -8,4 +8,5 @@ gemspec
 # Use the latest version of testcontainers-core from the local path
 gem "testcontainers-core", path: "../core"
 
-gem 'pry-rails'
+gem "pry-rails"
+

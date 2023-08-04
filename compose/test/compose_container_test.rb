@@ -119,7 +119,7 @@ class ComposeContainerTest < TestcontainersTest
     compose_file_name = ["docker-compose3.yml"]
     container = Testcontainers::ComposeContainer.new(filepath: TEST_PATH, compose_file_name: compose_file_name, env_file: ".env.test")
     container.start
-    stdout, stderr = container.run_in_container(service_name: "alpine", command: "printenv TEST_ASSERT_KEY")
+    stdout, _stderr = container.run_in_container(service_name: "alpine", command: "printenv TEST_ASSERT_KEY")
     assert_equal "successful test ", stdout.tr("\n", " ")
     container.stop
   end
@@ -128,7 +128,7 @@ class ComposeContainerTest < TestcontainersTest
     compose_file_name = ["docker-compose4.yml"]
     container = Testcontainers::ComposeContainer.new(filepath: TEST_PATH, compose_file_name: compose_file_name)
     container.start
-    stdout, stderr = container.logs
+    stdout, _stderr = container.logs
     assert_equal " Hello from Docker!", stdout.split("|")[3].split("\n")[0]
     container.stop
   end
