@@ -34,7 +34,7 @@ Create a new instance of the `Testcontainers::ComposeContainer` class:
 ``` ruby
 compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd)
 ```	
-The instance of above creates a new container with the path that have the .yml files   and the container.start wake up the containers  
+The instance creates a set of containers defined on the .yml file, the 'container.start' wakes up all containers as service
 
 Start the services of compose 
 
