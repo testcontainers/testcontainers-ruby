@@ -1,7 +1,6 @@
 require_relative "compose/version"
 require "testcontainers"
 require "open3"
-require "pry"
 require "net/http"
 require "json"
 require "uri"
@@ -9,27 +8,27 @@ module Testcontainers
   # ComposeContainer class is used to manage a large number of containers in a synchronous environment
   #
   # @attr_accesor [String] filepath used by the container
-  # @attr_accesor [String,List] compose_file_name used by the container
+  # @attr_accesor [String,List] compose_filename used by the container
   # @attr_accesor [Boolean] pull used by the container
   # @attr_accesor [Boolean] build used by the container
   # @attr_accesor [List] services used by the container
   class ComposeContainer
     # Default image used by the container
 
-    attr_accessor :filepath, :compose_file_name, :pull, :build, :env_file, :services
+    attr_accessor :filepath, :compose_filename, :pull, :build, :env_file, :services
 
     # Initializes a new instance of ComposeContainer
     #
     # @param image [String] the image to use
     # @param filepath [String] the filepath of the configuration files for the configuration of docker compose
-    # @param compose_file_name [String, List] the names of the files with yml extencion for custom configuration
+    # @param compose_filename [String, List] the names of the files with yml extencion for custom configuration
     # @param pull [Boolean] is the option for decide if there should be a pull request to generate the image for the containers
     # @param build [Boolean] is the option for decide if there have to use a build command for the images used for the containers
     # @param env_file [String] is the name of the envieroment configuration
     # @param services [List] are the names of the services that gonna use in the images of the containers
-    def initialize(filepath: ".", compose_file_name: ["docker-compose.yml"], pull: false, build: false, env_file: nil, services: nil, **kwargs)
+    def initialize(filepath: ".", compose_filename: ["docker-compose.yml"], pull: false, build: false, env_file: nil, services: nil, **kwargs)
       @filepath = filepath
-      @compose_file_names = compose_file_name
+      @compose_filenames = compose_filename
       @pull = pull
       @build = build
       @services = services
@@ -40,7 +39,7 @@ module Testcontainers
     # @return [docker_compose_cmd]
     def with_command
       docker_compose_cmd = ["docker compose"]
-      @compose_file_names.each do |file|
+      @compose_filenames.each do |file|
         docker_compose_cmd += ["-f  #{file}"]
       end
       if env_file.nil? == false
@@ -116,13 +115,30 @@ module Testcontainers
     # Return the response of generate a request to a url to  wich is located in our Docker s service and make a sleep for wait the server complete the build correctly
     # @params url [String]
     # @return response [Http]
-    def wait_for_request(url: nil)
-      sleep 3
-      url = URI.parse(url)
-      http = Net::HTTP.new(url.host, url.port)
-      http.read_timeout = 5
-      request = Net::HTTP::Get.new(url)
-      http.request(request)
+    def wait_for_request(url: nil, attemps_url: 2, timeout: 60, read_timeout: 3)
+      max_attemps_url = attemps_url
+      send = 0
+      Timeout.timeout(timeout) do
+        loop do
+          url = URI.parse(url)
+          http = Net::HTTP.new(url.host, url.port)
+          http.read_timeout = read_timeout
+          request = Net::HTTP::Get.new(url)
+          response = http.request(request)
+          return true if response.code == "200"
+        end
+      rescue Errno::ECONNREFUSED
+        sleep 1
+        retry
+      rescue URI::InvalidURIError
+        send += 1
+        sleep 1
+        if send <= max_attemps_url
+          retry
+        end
+      end
+    rescue Timeout::Error
+      raise TimeoutError, "Timed out waiting fot logs "
     end
   end
 end

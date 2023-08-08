@@ -34,7 +34,7 @@ Create a new instance of the `Testcontainers::ComposeContainer` class:
 ``` ruby
 compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd)
 ```	
-The instance creates a set of containers defined on the .yml file, the 'container.start' wakes up all containers as service
+The instance creates a set of containers defined on the .yml file, the 'compose.start' wakes up all containers as service
 
 Start the services of compose 
 
@@ -49,46 +49,47 @@ compose.stop
 ```
 ### Connecting to services from the compose
 
-Once the service is running , tu can obtain the connecion details using the following methods 
+Once the service is running , tu can obtain the connecion details using the fol	lowing methods 
 
 ```ruby
 compose.process_information(service: "hub", port: 4444)
 ```
-This function gonna show the logs of the process
+This function will show the logs of the process
 
 ```ruby
 compose.logs
 ```
-This function make a request for the url nested for the service from compose
 
+To wait for a service running on a url you should use 'wait_for_request':
 
 ```ruby
-compose.wait_for_request(url: )
+compose.wait_for_request(url: "http://localhost:4444/hub")
 ```
 
 ### Configuration of services
-In this example we re gonna make a container with two services that use the yml files in the current path
+
+next example initialize compose with two services described in the YML file located in the current directory
 
 ```ruby
 services = ["hub","firefox"]
-container = Testcontainers::ComposeContainer.new(filepath: Dir.getwd, services: services)
+compose = Testcontainers::ComposeContainer.new(filepath: Dir.getwd, services: services)
 ```
 
-In this example we re gonna make a  continer by specific .yml files
+In this example we ll make a  continer by specific .yml files
 
 ```ruby
-compose_file_name = ["docker-compose2.yml", "docker-compose2.yml"]
-compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd, compose_file_name: compose_file_name)
+compose_filename = ["docker-compose2.yml", "docker-compose3.yml"]
+compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd, compose_filename: compose_filename)
 compose.start
 
 
 ```
-In this example we re gonna make a container with a enviorement variables configuration file
-
+You can overwrite an enviorement file as next:
 
 ```ruby
-compose_file_name = ["docker-compose3.yml"]
-compose = Testcontainers::ComposeContainer.new(filepath: TEST_PATH, compose_file_name: compose_file_name, env_file: ".env.test")
+TEST_PATH = "#{Dir.getwd}/test"
+compose_filename = ["docker-compose3.yml"]
+compose = Testcontainers::ComposeContainer.new(filepath: TEST_PATH, compose_filename: compose_filename, env_file: ".env.test")
 ```
 
 ### Send commands for the compose service 
