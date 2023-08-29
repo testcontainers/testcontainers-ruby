@@ -1,4 +1,4 @@
-# Testcontainers module for Compose
+# Testcontainers module for Docker Compose
 
 ## Installation
 
@@ -28,79 +28,79 @@ To use the library, you first need to require it:
 ```ruby
 require "testcontainers/compose"
 ```
-### Creating a Compose service
 
+### Creating a Compose Container
 Create a new instance of the `Testcontainers::ComposeContainer` class:
+
 ``` ruby
 compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd)
 ```	
+
 The instance creates a set of containers defined on the .yml file, the 'compose.start' wakes up all containers as service
 
-Start the services of compose 
+Start the services on the compose file.
 
 ```ruby
 compose.start
 ```
 
+Stop the services:
 
-Stop the services of compose
 ```ruby
 compose.stop
 ```
-### Connecting to services from the compose
 
-Once the service is running , tu can obtain the connecion details using the fol	lowing methods 
+### Connecting to services
 
-```ruby
-compose.process_information(service: "hub", port: 4444)
-```
-This function will show the logs of the process
+Once the service is running, you can obtain the mapped port to connect to it: 
 
 ```ruby
-compose.logs
+compose.service_port(service: "hub", port: 4444)
 ```
 
-To wait for a service running on a url you should use 'wait_for_request':
+You can inspect the logs of for the services also:
 
 ```ruby
-compose.wait_for_request(url: "http://localhost:4444/hub")
+puts compose.logs
+```
+
+You can use `wait_for_logs`, `wait_for_http` and `wait_for_tcp_port` to wait for the services to start:
+
+```ruby
+compose.wait_for_logs(/Service started/)
+compose.wait_for_http(url: "http://localhost:4444/hub")
+compose.wait_for_tcp_port(host: "localhost", port: 3306)
 ```
 
 ### Configuration of services
 
-next example initialize compose with two services described in the YML file located in the current directory
+This example initialize docker compose with two services described in the YML file located in the current directory:
 
 ```ruby
 services = ["hub","firefox"]
 compose = Testcontainers::ComposeContainer.new(filepath: Dir.getwd, services: services)
 ```
 
-In this example we ll make a  continer by specific .yml files
+You can specify the name of different docker-compose files also:
 
 ```ruby
-compose_filename = ["docker-compose2.yml", "docker-compose3.yml"]
-compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd, compose_filename: compose_filename)
+compose_filenames = ["docker-compose.dbs.yml", "docker-compose.web.yml"]
+compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd, compose_filenames: compose_filenames)
 compose.start
-
-
 ```
-You can overwrite an enviorement file as next:
+
+An env file can be specified when starting the services:
 
 ```ruby
-TEST_PATH = "#{Dir.getwd}/test"
-compose_filename = ["docker-compose3.yml"]
-compose = Testcontainers::ComposeContainer.new(filepath: TEST_PATH, compose_filename: compose_filename, env_file: ".env.test")
+compose_filename = ["docker-compose.test.yml"]
+compose = Testcontainers::ComposeContainer.new(filepath: Dir.getwd, env_file: ".env.test")
 ```
 
-### Send commands for the compose service 
+### Executing commands in the container for a service
+
 ```ruby
-compose.run_in_container(service_name: "hub", command: "echo test")
+compose.exec(service_name: "hub", command: "echo test")
 ```
-
-
-
-###
-
 
 
 ## Contributing
@@ -113,6 +113,5 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 
 ## Code of Conduct
-
 
 Everyone interacting in the Testcontainers project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/testcontainers/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).

@@ -1,9 +1,7 @@
 require_relative "compose/version"
 require "testcontainers"
 require "open3"
-require "net/http"
-require "json"
-require "uri"
+
 module Testcontainers
   # ComposeContainer class is used to manage a large number of containers in a synchronous environment
   #
@@ -15,7 +13,7 @@ module Testcontainers
   class ComposeContainer
     # Default image used by the container
 
-    attr_accessor :filepath, :compose_filename, :pull, :build, :env_file, :services
+    attr_accessor :filepath, :compose_filenames, :pull, :build, :env_file, :services
 
     # Initializes a new instance of ComposeContainer
     #
@@ -26,119 +24,219 @@ module Testcontainers
     # @param build [Boolean] is the option for decide if there have to use a build command for the images used for the containers
     # @param env_file [String] is the name of the envieroment configuration
     # @param services [List] are the names of the services that gonna use in the images of the containers
-    def initialize(filepath: ".", compose_filename: ["docker-compose.yml"], pull: false, build: false, env_file: nil, services: nil, **kwargs)
+    def initialize(command: ["docker compose"], filepath: ".", compose_filenames: ["docker-compose.yml"],
+      pull: false, build: false, env_file: nil, services: nil)
+
+      @command = command
       @filepath = filepath
-      @compose_filenames = compose_filename
+      @compose_filenames = compose_filenames
       @pull = pull
       @build = build
       @services = services
       @env_file = env_file
+      @_container_started = false
     end
 
-    # Specify the names of the all names of the configuration files and if necesary of the env_file for enviorements variables
-    # @return [docker_compose_cmd]
-    def with_command
-      docker_compose_cmd = ["docker compose"]
-      @compose_filenames.each do |file|
-        docker_compose_cmd += ["-f  #{file}"]
-      end
-      if env_file.nil? == false
-        docker_compose_cmd.push("--env-file #{@env_file}")
-      end
-      docker_compose_cmd.join(" ")
-    end
-
-    # Generete the commands for the containers add the sentences of the function of with_command  and send them for the subprocess funciontions from Open3
+    # Run the containers using the `docker-compose up` command
+    #
+    # @return [ComposeContainer] self
     def start
+      return self if @_container_started
+
       if @pull
-        pull_cmd = "#{with_command} pull"
-        Open3.capture2(pull_cmd, chdir: @filepath)
+        pull_cmd = compose_command("pull")
+        exec_command(pull_cmd)
       end
 
-      up_cmd = " #{with_command} up -d"
-      if @build
-        up_cmd.concat(" --build")
-      end
+      args = ["up", "-d"]
+      args << "--build" if @build
+      args << @services.join(" ") if @services
+      up_cmd = compose_command(args)
+      _, _, status = exec_command(up_cmd)
+      @_container_started = true if status.success?
 
-      if @services
-        up_cmd.concat(" #{@services.join(" ")}")
-      end
-
-      Open3.capture2(up_cmd, chdir: @filepath)
+      self
     end
 
-    # Generate the command for stop the containers and send them for method of subprocess from Open3
+    # Stop the containers using the `docker-compose down` command
+    #
+    # @return [ComposeContainer] self
     def stop
-      down_cmd = with_command.concat(" down -v")
-      # call_command(cmd: down_cmd, option: 1)
-      Open3.capture2(down_cmd, chdir: @filepath)
+      raise ContainerNotStartedError unless @_container_started
+
+      down_cmd = compose_command("down -v")
+      _, _, status = exec_command(down_cmd)
+      @_container_started = false if status.success?
+
+      self
     end
 
-    # Generate the command for see the logs of the container´s process
+    def running?
+      @_container_started
+    end
+
+    def exited?
+      !running?
+    end
+
+    # Return the logs of the containers using the `docker-compose logs` command
+    #
+    # @return [String] logs
     def logs
-      command_logs = with_command.concat(" logs")
-      Open3.capture3(command_logs, chdir: @filepath)
+      raise ContainerNotStartedError unless @_container_started
+
+      logs_command = compose_command("logs")
+      stdout, _, _ = exec_command(logs_command)
+      stdout
     end
 
-    # Generate the command for send a exec process for a container process and send it to a Open3 process
-    # @params service_name [String]
-    # @params command [String]
-    def run_in_container(service_name: nil, command: nil)
-      command_exec = with_command.concat(" exec -T #{service_name} #{command}")
-      Open3.capture2(command_exec, chdir: @filepath)
+    # Execute a command in the given service using the `docker-compose exec` command
+    #
+    # @param service_name [String]
+    # @param command [String]
+    def exec(service_name:, command:)
+      raise ContainerNotStartedError unless @_container_started
+
+      exec_cmd = compose_command(["exec", "-T", service_name, command])
+      exec_command(exec_cmd)
     end
 
-    # Confirm the ports number for the service that is in the parameters
-    # @params service [String]
+    # Return the mapped port for a given service and port using the `docker-compose port` command
+    #
+    # @param service [String]
     # @return port [int]
-    def port_process(service: nil, port: 0)
-      process_information(service: service, port: port)[0]
+    def service_port(service: nil, port: 0)
+      raise ContainerNotStartedError unless @_container_started
+
+      _service_info(service: service, port: port)["port"]
     end
 
-    # Return the host that where is located the service that is  in the parameters
-    # @params service [String]
+    # Return the host for a given service and port using the `docker-compose port` command
+    #
+    # @param service [String]
     # @return host  [String]
-    def host_process(service: nil, port: 0)
-      process_information(service: service, port: port)[1]
+    def service_host(service: nil, port: 0)
+      raise ContainerNotStartedError unless @_container_started
+
+      _service_info(service: service, port: port)["host"]
     end
 
-    # Return the host and the port from the service in a Array
-    # @params service [String]
-    # @return [List]
-    def process_information(service: nil, port: 0)
-      command_port = with_command.concat(" port #{service} #{port}")
-      stdout, stderr, status = Open3.capture3(command_port, chdir: @filepath)
-      host, port = stdout.strip.split(":")
-      [host, port, stderr, status]
-    end
+    # Waits for the container logs to match the given regex.
+    #
+    # @param matcher [Regexp] The regex to match.
+    # @param timeout [Integer] The number of seconds to wait for the logs to match.
+    # @param interval [Float] The number of seconds to wait between checks.
+    # @return [Boolean] Whether the logs matched the regex.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    # @raise [TimeoutError] If the timeout is reached.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    def wait_for_logs(matcher:, timeout: 60, interval: 0.1)
+      raise ContainerNotStartedError unless @_container_started
 
-    # Return the response of generate a request to a url to  wich is located in our Docker s service and make a sleep for wait the server complete the build correctly
-    # @params url [String]
-    # @return response [Http]
-    def wait_for_request(url: nil, attemps_url: 2, timeout: 60, read_timeout: 3)
-      max_attemps_url = attemps_url
-      send = 0
       Timeout.timeout(timeout) do
         loop do
-          url = URI.parse(url)
-          http = Net::HTTP.new(url.host, url.port)
-          http.read_timeout = read_timeout
-          request = Net::HTTP::Get.new(url)
-          response = http.request(request)
-          return true if response.code == "200"
-        end
-      rescue Errno::ECONNREFUSED
-        sleep 1
-        retry
-      rescue URI::InvalidURIError
-        send += 1
-        sleep 1
-        if send <= max_attemps_url
-          retry
+          return true if logs&.match?(matcher)
+
+          sleep interval
         end
       end
     rescue Timeout::Error
-      raise TimeoutError, "Timed out waiting fot logs "
+      raise TimeoutError, "Timed out waiting for logs to match #{matcher}"
+    end
+
+    # Waits for the container to open the given port.
+    #
+    # @param port [Integer] The port to wait for.
+    # @param timeout [Integer] The number of seconds to wait for the port to open.
+    # @param interval [Float] The number of seconds to wait between checks.
+    # @return [Boolean] Whether the port is open.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    # @raise [TimeoutError] If the timeout is reached.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @raise [PortNotMappedError] If the port is not mapped.
+    def wait_for_tcp_port(host:, port:, timeout: 60, interval: 0.1)
+      raise ContainerNotStartedError unless @_container_started
+
+      Timeout.timeout(timeout) do
+        loop do
+          Timeout.timeout(interval) do
+            TCPSocket.new(host, port).close
+            return true
+          end
+        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Timeout::Error
+          sleep interval
+        end
+      end
+    rescue Timeout::Error
+      raise TimeoutError, "Timed out waiting for port #{port} to open"
+    end
+
+    # Waits for the container to respond to HTTP requests.
+    #
+    # @param service [String] The name of the service.
+    # @param timeout [Integer] The number of seconds to wait for the TCP connection to be established.
+    # @param interval [Float] The number of seconds to wait between checks.
+    # @param path [String] The path to request.
+    # @param container_port [Integer] The container port to request.
+    # @param https [Boolean] Whether to use TLS.
+    # @param status [Integer] The expected HTTP status code.
+    # @return [Boolean] Whether the container is responding to HTTP requests.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    # @raise [TimeoutError] If the timeout is reached.
+    # @raise [PortNotMappedError] If the port is not mapped.
+    def wait_for_http(url:, timeout: 60, interval: 0.1, status: 200)
+      raise ContainerNotStartedError unless @_container_started
+
+      Timeout.timeout(timeout) do
+        loop do
+          begin
+            response = Excon.get(url)
+            return true if response.status == status
+          rescue Excon::Error::Socket
+            # The container may not be ready to accept connections yet
+          end
+
+          sleep interval
+        end
+      end
+    rescue Timeout::Error
+      raise TimeoutError, "Timed out waiting for HTTP status #{status} on #{path}"
+    end
+
+    private
+
+    def exec_command(cmd)
+      stdout, stderr, status = Open3.capture3(cmd, chdir: @filepath)
+
+      [stdout, stderr, status]
+    end
+
+    def compose_command(args)
+      # Prepare the args and command
+      args = args.split(" ") if args.is_a?(String)
+      compose_command = @command.dup
+      compose_command = compose_comand.split(" ") if compose_command.is_a?(String)
+
+      # Add the compose files
+      file_args = @compose_filenames.map { |filename| "-f #{filename}" }
+      compose_command += file_args
+
+      # Add the env file
+      compose_command.push("--env-file #{env_file}") if env_file
+
+      # Add the args
+      compose_command += args
+
+      # Return the command
+      compose_command.join(" ")
+    end
+
+    # Return the host and the mapped port for the given service and port
+    def _service_info(service: nil, port: 0)
+      port_command = compose_command(["port", service, port])
+      stdout, _, _ = exec_command(port_command)
+      host, port = stdout.strip.split(":")
+      {"host" => host, "port" => port}
     end
   end
 end
