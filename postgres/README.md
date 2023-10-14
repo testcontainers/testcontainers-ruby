@@ -119,7 +119,7 @@ You can manage the container in the `before(:suite)` / `after(:suite)` blocks in
 
 ```ruby
 RSpec.configure do |config|
-  # This helps us to have access to the `RSpec.configuration.mysql_container` without using global variables.
+  # This helps us to have access to the `RSpec.configuration.postgres_container` without using global variables.
   config.add_setting :postgres_container, default: nil
 
   config.before(:suite) do
