@@ -530,11 +530,12 @@ module Testcontainers
 
     # Removes the container.
     #
+    # @param options [Hash] Additional options to send to the container remove command.
     # @return [DockerContainer] The DockerContainer instance.
     # @return [nil] If the container does not exist.
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
-    def remove
-      @_container&.remove
+    def remove(options = {})
+      @_container&.remove(options)
       @_container = nil
       self
     rescue Excon::Error::Socket => e
@@ -730,6 +731,24 @@ module Testcontainers
     def first_mapped_port
       raise ContainerNotStartedError unless @_container
       container_ports.map { |port| mapped_port(port) }.first
+    end
+
+    # Returns the container's mounts.
+    #
+    # @return [Array<Hash>] An array of the container's mounts.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    def mounts
+      info["Mounts"]
+    end
+
+    # Returns the container's mount names.
+    #
+    # @return [Array<String>] The container's mount names.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    def mount_names
+      mounts.map { |mount| mount["Name"] }
     end
 
     # Returns the value for the given environment variable.
