@@ -1,3 +1,11 @@
+## Unreleased
+
+### Added
+
+- DockerContainer#new now accepts optional keyword argument `image_create_options` which accepts a hash. Passes the options to `Docker::Image.create`. See the [Docker ImageCreate api](https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageCreate) for available parameters.
+
+- DockerContainer#remove now accepts an optional options hash. See the [Docker ContainerDelete api](https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerDelete) for available parameters.
+
 ## [0.1.3] - 2023-06-10
 
 ### Added

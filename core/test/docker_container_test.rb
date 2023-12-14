@@ -30,6 +30,20 @@ class DockerContainerTest < TestcontainersTest
     super
   end
 
+  def test_it_creates_an_image_with_options
+    good_container = Testcontainers::DockerContainer.new("hello-world", image_create_options: {"tag" => "latest"})
+    bad_container = Testcontainers::DockerContainer.new("hello-world", image_create_options: {"tag" => "nonexistent_tag"})
+    good_container.start
+
+    assert good_container.exists?
+    assert_raises(Testcontainers::NotFoundError) { bad_container.start }
+  ensure
+    good_container.stop if good_container.exists? && good_container.running?
+    good_container.remove if good_container.exists?
+    bad_container.stop if bad_container.exists? && bad_container.running?
+    bad_container.remove if bad_container.exists?
+  end
+
   def test_it_returns_the_container_image
     assert_equal "hello-world", @container.image
   end

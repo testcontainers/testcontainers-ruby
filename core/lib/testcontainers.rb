@@ -12,6 +12,8 @@ module Testcontainers
 
   class ConnectionError < Error; end
 
+  class NotFoundError < Error; end
+
   class TimeoutError < Error; end
 
   class ContainerNotStartedError < Error; end
