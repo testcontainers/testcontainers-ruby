@@ -50,6 +50,8 @@ Tescontainers contains modules that can be used instead of the generic
 DockerContainer for common databases and services, providing
 pre-configured setups and reducing the amount of boilerplate code:
 
+- [ComposeContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/compose)
+
 - [ElasticsearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/elasticsearch)
 
 - [MariadbContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mariadb)
@@ -68,6 +70,7 @@ pre-configured setups and reducing the amount of boilerplate code:
 
 - [RedpandaContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redpanda)
 
+- [SeleniumContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/selenium)
 
 
 ## Development
