@@ -7,7 +7,7 @@ PATH
 PATH
   remote: compose
   specs:
-    testcontainers-compose (0.1.0)
+    testcontainers-compose (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
@@ -19,61 +19,61 @@ PATH
 PATH
   remote: elasticsearch
   specs:
-    testcontainers-elasticsearch (0.1.0)
+    testcontainers-elasticsearch (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: mariadb
   specs:
-    testcontainers-mariadb (0.1.1)
+    testcontainers-mariadb (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: mongo
   specs:
-    testcontainers-mongo (0.1.0)
+    testcontainers-mongo (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: mysql
   specs:
-    testcontainers-mysql (0.1.1)
+    testcontainers-mysql (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: nginx
   specs:
-    testcontainers-nginx (0.1.0)
+    testcontainers-nginx (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: postgres
   specs:
-    testcontainers-postgres (0.1.1)
+    testcontainers-postgres (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: rabbitmq
   specs:
-    testcontainers-rabbitmq (0.1.0)
+    testcontainers-rabbitmq (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: redis
   specs:
-    testcontainers-redis (0.1.1)
+    testcontainers-redis (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: redpanda
   specs:
-    testcontainers-redpanda (0.1.0)
+    testcontainers-redpanda (0.2.0)
       testcontainers-core (~> 0.1)
 
 PATH
   remote: selenium
   specs:
-    testcontainers-selenium (0.1.0)
+    testcontainers-selenium (0.2.0)
       testcontainers-core (~> 0.1)
 
 GEM

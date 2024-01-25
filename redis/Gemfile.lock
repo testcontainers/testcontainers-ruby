@@ -7,7 +7,7 @@ PATH
 PATH
   remote: .
   specs:
-    testcontainers-redis (0.1.1)
+    testcontainers-redis (0.2.0)
       testcontainers-core (~> 0.1)
 
 GEM

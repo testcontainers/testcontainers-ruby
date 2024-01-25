@@ -7,7 +7,7 @@ PATH
 PATH
   remote: .
   specs:
-    testcontainers-mysql (0.1.1)
+    testcontainers-mysql (0.2.0)
       testcontainers-core (~> 0.1)
 
 GEM
