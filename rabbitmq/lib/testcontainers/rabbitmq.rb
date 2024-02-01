@@ -24,6 +24,11 @@ module Testcontainers
     # Default vhost used by the container
     RABBITMQ_DEFAULT_VHOST = "/"
 
+    # Default "wait for" strategy
+    WAIT_FOR_PROC = ->(container) {
+      container.wait_for_logs(/startup complete/, timeout: 20)
+    }
+
     attr_reader :username, :password, :vhost
 
     # Initializes a new instance of RabbitMQContainer
@@ -31,23 +36,20 @@ module Testcontainers
     #  @param image [String] the image to use
     #  @param username [String] the username to use
     #  @param password [String] the password to use
-    #  @param port [String] the port to use
+    #  @param vhost [String]
     #  @param kwargs [Hash] the options to pass to the container. See {DockerContainer#initialize}
     #  @return [RabbitmqContainer] a new instance of RabbitmqContainer
     def initialize(image = RABBITMQ_DEFAULT_IMAGE, username: nil, password: nil, vhost: nil, **kwargs)
-      super(image, **kwargs)
+      super(image, wait_for: WAIT_FOR_PROC, exposed_ports: [RABBITMQ_QUEUE_DEFAULT_PORT, RABBITMQ_MGMT_UI_DEFAULT_PORT], **kwargs)
       @username = username || ENV.fetch("RABBITMQ_USER", RABBITMQ_DEFAULT_USER)
       @password = password || ENV.fetch("RABBITMQ_PASSWORD", RABBITMQ_DEFAULT_PASS)
       @vhost = vhost || ENV.fetch("RABBITMQ_VHOST", RABBITMQ_DEFAULT_VHOST)
-      @healthcheck ||= add_healthcheck(_default_healthcheck_options)
-      @wait_for ||= add_wait_for(:healthcheck)
     end
 
     # Starts the container
     #
     # @return [RabbitmqContainer] self
     def start
-      with_exposed_ports([port, management_ui_port])
       _configure
       super
     end
@@ -141,10 +143,6 @@ module Testcontainers
       add_env("RABBITMQ_DEFAULT_USER", @username)
       add_env("RABBITMQ_DEFAULT_PASS", @password)
       add_env("RABBITMQ_DEFAULT_VHOST", @vhost) if @vhost
-    end
-
-    def _default_healthcheck_options
-      {test: %w[rabbitmqctl node_health_check], interval: 10, timeout: 10, retries: 5}
     end
   end
 end
