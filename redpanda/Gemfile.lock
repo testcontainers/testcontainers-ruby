@@ -7,7 +7,7 @@ PATH
 PATH
   remote: .
   specs:
-    testcontainers-redpanda (0.1.0)
+    testcontainers-redpanda (0.2.0)
       testcontainers-core (~> 0.1)
 
 GEM

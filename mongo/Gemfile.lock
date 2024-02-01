@@ -7,7 +7,7 @@ PATH
 PATH
   remote: .
   specs:
-    testcontainers-mongo (0.1.0)
+    testcontainers-mongo (0.2.0)
       testcontainers-core (~> 0.1)
 
 GEM
