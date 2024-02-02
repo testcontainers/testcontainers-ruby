@@ -75,8 +75,8 @@ module Testcontainers
       startup_script = StringIO.new
       startup_script.print("#!/bin/sh\n")
       startup_script.print("/usr/bin/rpk redpanda start --mode dev-container")
-      startup_script.print(" --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092")
-      startup_script.print(" --advertise-kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://#{host}:#{mapped_port(port)}")
+      startup_script.print(" --kafka-addr PLAINTEXT://127.0.0.1:29092,OUTSIDE://127.0.0.1:9092")
+      startup_script.print(" --advertise-kafka-addr PLAINTEXT://127.0.0.1:29092,OUTSIDE://#{host}:#{mapped_port(port)}")
       startup_script
     end
 
