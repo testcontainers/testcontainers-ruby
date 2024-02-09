@@ -1,0 +1,52 @@
+{
+    "folders": [
+       {
+            "name": "module / compose",
+            "path": "../compose"
+        },
+        {
+            "name": "testcontainers-ruby",
+            "path": "../core"
+        },
+        {
+            "name": "module / elasticsearch",
+            "path": "../elasticsearch"
+        },
+        {
+            "name": "module / mariadb",
+            "path": "../mariadb"
+        },
+        {
+            "name": "module / mongo",
+            "path": "../mongo"
+        },
+        {
+            "name": "module / mysql",
+            "path": "../mysql"
+        },
+        {
+            "name": "module / nginx",
+            "path": "../nginx"
+        },
+        {
+            "name": "module / postgres",
+            "path": "../postgres"
+        },
+        {
+            "name": "module / rabbitmq",
+            "path": "../rabbitmq"
+        },
+        {
+            "name": "module / redis",
+            "path": "../redis"
+        },
+        {
+            "name": "module / redpanda",
+            "path": "../redpanda"
+        },
+        {
+            "name": "module / selenium",
+            "path": "../selenium"
+        }
+    ]
+}
