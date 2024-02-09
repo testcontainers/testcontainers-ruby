@@ -26,7 +26,7 @@ TestContainers is composed of modules for common databases and services. This ch
 
 - [SeleniumContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/selenium/CHANGELOG.md)
 
-## [0.2.0] - 2023-12-18
+## [0.2.0] - 2024-02-08
 
 ### Added
 
