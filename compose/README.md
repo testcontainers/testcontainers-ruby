@@ -33,8 +33,8 @@ require "testcontainers/compose"
 Create a new instance of the `Testcontainers::ComposeContainer` class:
 
 ``` ruby
-compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd)
-```	
+compose = Testcontainers::ComposeContainer.new(filepath: Dir.getwd)
+```
 
 The instance creates a set of containers defined on the .yml file, the 'compose.start' wakes up all containers as service
 
@@ -52,7 +52,7 @@ compose.stop
 
 ### Connecting to services
 
-Once the service is running, you can obtain the mapped port to connect to it: 
+Once the service is running, you can obtain the mapped port to connect to it:
 
 ```ruby
 compose.service_port(service: "hub", port: 4444)
@@ -85,7 +85,7 @@ You can specify the name of different docker-compose files also:
 
 ```ruby
 compose_filenames = ["docker-compose.dbs.yml", "docker-compose.web.yml"]
-compose = Testcontainer::ComposeContainer.new(filepath: Dir.getwd, compose_filenames: compose_filenames)
+compose = Testcontainers::ComposeContainer.new(filepath: Dir.getwd, compose_filenames: compose_filenames)
 compose.start
 ```
 
