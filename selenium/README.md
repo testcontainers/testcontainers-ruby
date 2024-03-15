@@ -36,16 +36,16 @@ require "testcontainers/selenium"
 Create a new instance of the `Testcontainers::SeleniumContainer` class:
 
 ```ruby
-container = Testcontainer::SeleniumContainer.new
+container = Testcontainers::SeleniumContainer.new
 ```
 
 This creates a new container with the default Selenium configuration for firefox, the vnc password will be `secret`. You can customise by passing arguments to the constructor:
 
 ```ruby
-container = Testcontainer::SeleniumContainer.new(capabilities: :chrome, vnc_no_password: true)
+container = Testcontainers::SeleniumContainer.new(capabilities: :chrome, vnc_no_password: true)
 ```
 
-### Starting and Stopping a container 
+### Starting and Stopping a container
 
 Start the container
 
@@ -59,7 +59,7 @@ Stop the container when you're done
 container.stop
 ```
 
-### Connecting to the Selenium container 
+### Connecting to the Selenium container
 
 Once the container is running, you can obtain the connection details using the following methods:
 
@@ -85,7 +85,7 @@ There are complete examples of how to use testcontainers-selenium to create cont
 require "testcontainers/selenium"
 require "selenium-webdriver"
 
-container = Testcontainer::SeleniumContainer.new
+container = Testcontainers::SeleniumContainer.new
 container.start
 
 driver = Selenium::WebDriver.for(:firefox, :url => @container.selenium_url)
