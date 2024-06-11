@@ -44,7 +44,7 @@ container = Testcontainers::NginxContainer.new
 This creates a new container with the default Nginx image and port. You can customize these by passing arguments to the constructor:
 
 ```ruby
-container = Testcontainers::MysqlContainer.new("nginx:alpine", port: 8080)
+container = Testcontainers::NginxContainer.new("nginx:alpine", port: 8080)
 ```
 
 You can setup filesystem binds to configure the container with custom configuration files or to serve content from a custom path:
