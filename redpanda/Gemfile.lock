@@ -37,7 +37,8 @@ GEM
       mini_portile2 (~> 2.6)
       rake (> 12)
     regexp_parser (2.8.0)
-    rexml (3.2.5)
+    rexml (3.3.6)
+      strscan
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -65,6 +66,7 @@ GEM
     standard-performance (1.0.1)
       lint_roller (~> 1.0)
       rubocop-performance (~> 1.16.0)
+    strscan (3.1.0)
     unicode-display_width (2.4.2)
 
 PLATFORMS
