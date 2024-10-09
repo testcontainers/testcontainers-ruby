@@ -700,7 +700,7 @@ module Testcontainers
 
       if inside_container? && ENV["DOCKER_HOST"].nil?
         gateway_ip = container_gateway_ip
-        return bridge_ip if gateway_ip == host
+        return container_bridge_ip if gateway_ip == host
         return gateway_ip
       end
       host
