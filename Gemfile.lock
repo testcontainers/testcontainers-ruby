@@ -131,8 +131,7 @@ GEM
     redis-client (0.14.1)
       connection_pool
     regexp_parser (2.8.0)
-    rexml (3.3.6)
-      strscan
+    rexml (3.3.9)
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -170,7 +169,6 @@ GEM
     standard-performance (1.0.1)
       lint_roller (~> 1.0)
       rubocop-performance (~> 1.16.0)
-    strscan (3.1.0)
     unicode-display_width (2.4.2)
     yard (0.9.36)
 
