@@ -215,7 +215,7 @@ module Testcontainers
       # Prepare the args and command
       args = args.split(" ") if args.is_a?(String)
       compose_command = @command.dup
-      compose_command = compose_comand.split(" ") if compose_command.is_a?(String)
+      compose_command = compose_command.split(" ") if compose_command.is_a?(String)
 
       # Add the compose files
       file_args = @compose_filenames.map { |filename| "-f #{filename}" }
