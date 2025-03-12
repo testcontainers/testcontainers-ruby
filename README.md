@@ -44,6 +44,35 @@ container.delete
 
 For a more detailed example, please refer to the Quickstart Guide under the docs folder.
 
+### Included modules
+
+Tescontainers contains modules that can be used instead of the generic
+DockerContainer for common databases and services, providing
+pre-configured setups and reducing the amount of boilerplate code:
+
+- [ComposeContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/compose)
+
+- [ElasticsearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/elasticsearch)
+
+- [MariadbContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mariadb)
+
+- [MongoContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mongo)
+
+- [MysqlContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mysql)
+
+- [NginxContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/nginx)
+
+- [PostgresContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/postgres)
+
+- [RabbitmqContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/rabbitmq)
+
+- [RedisContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redis)
+
+- [RedpandaContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/redpanda)
+
+- [SeleniumContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/selenium)
+
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -52,7 +81,7 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/guilleiguaran/testcontainers-ruby. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/guilleiguaran/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/testcontainers/testcontainers-ruby. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/testcontainers/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -60,4 +89,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Testcontainers project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/guilleiguaran/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the Testcontainers project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/testcontainers/testcontainers-ruby/blob/main/CODE_OF_CONDUCT.md).

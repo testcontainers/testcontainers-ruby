@@ -60,11 +60,11 @@ class RedpandaContainerTest < TestcontainersTest
       "auto.offset.reset": "earliest"
     }
 
-    consumer = Rdkafka::Config.new(config).consumer
-    consumer.subscribe("ruby-test-topic")
-
     producer = Rdkafka::Config.new(config).producer
     producer.produce(payload: "Hello, Redpanda!", topic: "ruby-test-topic").wait
+
+    consumer = Rdkafka::Config.new(config).consumer
+    consumer.subscribe("ruby-test-topic")
 
     message = consumer.each do |msg|
       break msg

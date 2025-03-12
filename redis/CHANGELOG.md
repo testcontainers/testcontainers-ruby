@@ -1,4 +1,8 @@
-## Unreleased
+## [0.1.1] - 2023-6-10
+
+### Added
+
+- Add healthcheck support on start
 
 ### Fixed
 

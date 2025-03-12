@@ -5,12 +5,12 @@ require_relative "lib/testcontainers/mongo/version"
 Gem::Specification.new do |spec|
   spec.name = "testcontainers-mongo"
   spec.version = Testcontainers::Mongo::VERSION
-  spec.authors = ["Guillermo Iguaran"]
-  spec.email = ["guilleiguaran@gmail.com"]
+  spec.authors = ["Pedro Piza", "Guillermo Iguaran"]
+  spec.email = ["pedro920224@gmail.com", "guilleiguaran@gmail.com"]
 
   spec.summary = "Testcontainers for Ruby: Mongo module"
   spec.description = "Testcontainers makes it easy to create and clean up container-based dependencies for automated tests."
-  spec.homepage = "https://github.com/guilleiguaran/testcontainers-ruby"
+  spec.homepage = "https://github.com/testcontainers/testcontainers-ruby"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
 
@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "testcontainers-core", "~> 0.1.2"
+  spec.add_dependency "testcontainers-core", "~> 0.1"
 
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "minitest", "~> 5.0"

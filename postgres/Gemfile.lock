@@ -1,14 +1,14 @@
 PATH
   remote: ../core
   specs:
-    testcontainers-core (0.1.2)
+    testcontainers-core (0.2.0)
       docker-api (~> 2.2)
 
 PATH
   remote: .
   specs:
-    testcontainers-postgres (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-postgres (0.2.0)
+      testcontainers-core (~> 0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -32,7 +32,7 @@ GEM
     rainbow (3.1.1)
     rake (13.0.6)
     regexp_parser (2.8.0)
-    rexml (3.2.5)
+    rexml (3.3.9)
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -64,6 +64,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  ruby
   x86_64-darwin-22
 
 DEPENDENCIES

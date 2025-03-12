@@ -30,6 +30,20 @@ class DockerContainerTest < TestcontainersTest
     super
   end
 
+  def test_it_creates_an_image_with_options
+    good_container = Testcontainers::DockerContainer.new("hello-world", image_create_options: {"tag" => "latest"})
+    bad_container = Testcontainers::DockerContainer.new("hello-world", image_create_options: {"tag" => "nonexistent_tag"})
+    good_container.start
+
+    assert good_container.exists?
+    assert_raises(Testcontainers::NotFoundError) { bad_container.start }
+  ensure
+    good_container.stop if good_container.exists? && good_container.running?
+    good_container.remove if good_container.exists?
+    bad_container.stop if bad_container.exists? && bad_container.running?
+    bad_container.remove if bad_container.exists?
+  end
+
   def test_it_returns_the_container_image
     assert_equal "hello-world", @container.image
   end
@@ -82,9 +96,16 @@ class DockerContainerTest < TestcontainersTest
     assert_equal({"80/tcp" => [{"HostPort" => "8080"}], "8080/tcp" => [{"HostPort" => "8081"}], "443/tcp" => [{"HostPort" => "443"}]}, container.port_bindings)
   end
 
-  def test_it_returns_the_container_volumes
+  def test_it_creates_and_returns_the_container_volumes
     container = Testcontainers::DockerContainer.new("hello-world", volumes: ["/tmp"])
+    container.start
+    mount_name = container.mount_names.first
+
+    assert_equal mount_name, Docker::Volume.get(mount_name).id
     assert_equal({"/tmp" => {}}, container.volumes)
+  ensure
+    container.stop if container.exists? && container.running?
+    container.remove({v: true}) if container.exists?
   end
 
   def test_it_returns_the_container_labels
@@ -269,6 +290,19 @@ class DockerContainerTest < TestcontainersTest
   ensure
     container.stop if container.exists? && container.running?
     container.remove if container.exists?
+  end
+
+  def test_it_removes_a_container_and_its_volumes
+    container = Testcontainers::DockerContainer.new("hello-world", volumes: ["/tmp"])
+    container.start
+    mount_name = container.mount_names.first
+    container.remove({v: true})
+
+    refute container.exists?
+    assert_raises(Docker::Error::NotFoundError) { Docker::Volume.get(mount_name) }
+  ensure
+    container.stop if container.exists? && container.running?
+    container.remove({v: true}) if container.exists?
   end
 
   def test_it_restarts_a_container

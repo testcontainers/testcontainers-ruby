@@ -30,6 +30,7 @@ module Testcontainers
     # @param command [Array<String>, nil] the command to run in the container
     # @param name [String, nil] the container's name
     # @param exposed_ports [Hash, Array<String>, nil] a hash or an array of exposed container ports
+    # @param image_create_options [Hash] a hash of options to pass to Docker::Image.create.
     # @param port_bindings [Hash, Array<String>, nil] a hash or an array of container ports to host port bindings
     # @param volumes [Hash, Array<String>, nil] a hash or an array of volume paths in the container
     # @param filesystem_binds [Array<String>, Hash, nil] an array of strings or a hash representing bind mounts from the host to the container
@@ -37,7 +38,7 @@ module Testcontainers
     # @param labels [Hash, nil] a hash of labels to be applied to the container
     # @param working_dir [String, nil] the working directory for the container
     # @param logger [Logger] a logger instance for the container
-    def initialize(image, name: nil, command: nil, entrypoint: nil, exposed_ports: nil, port_bindings: nil, volumes: nil, filesystem_binds: nil,
+    def initialize(image, name: nil, command: nil, entrypoint: nil, exposed_ports: nil, image_create_options: {}, port_bindings: nil, volumes: nil, filesystem_binds: nil,
       env: nil, labels: nil, working_dir: nil, healthcheck: nil, wait_for: nil, logger: Testcontainers.logger)
 
       @image = image
@@ -45,6 +46,7 @@ module Testcontainers
       @command = command
       @entrypoint = entrypoint
       @exposed_ports = add_exposed_ports(exposed_ports) if exposed_ports
+      @image_create_options = image_create_options
       @port_bindings = add_fixed_exposed_ports(port_bindings) if port_bindings
       @volumes = add_volumes(volumes) if volumes
       @env = add_env(env) if env
@@ -468,8 +470,9 @@ module Testcontainers
     #
     # @return [DockerContainer] The DockerContainer instance.
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @raise [NotFoundError] If Docker is unable to find the image.
     def start
-      Docker::Image.create("fromImage" => @image)
+      Docker::Image.create({"fromImage" => @image}.merge(@image_create_options))
 
       @_container ||= Docker::Container.create(_container_create_options)
       @_container.start
@@ -482,6 +485,8 @@ module Testcontainers
       @wait_for&.call(self)
 
       self
+    rescue Docker::Error::NotFoundError => e
+      raise NotFoundError, e.message
     rescue Excon::Error::Socket => e
       raise ConnectionError, e.message
     end
@@ -530,11 +535,12 @@ module Testcontainers
 
     # Removes the container.
     #
+    # @param options [Hash] Additional options to send to the container remove command.
     # @return [DockerContainer] The DockerContainer instance.
     # @return [nil] If the container does not exist.
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
-    def remove
-      @_container&.remove
+    def remove(options = {})
+      @_container&.remove(options)
       @_container = nil
       self
     rescue Excon::Error::Socket => e
@@ -694,7 +700,7 @@ module Testcontainers
 
       if inside_container? && ENV["DOCKER_HOST"].nil?
         gateway_ip = container_gateway_ip
-        return bridge_ip if gateway_ip == host
+        return container_bridge_ip if gateway_ip == host
         return gateway_ip
       end
       host
@@ -730,6 +736,24 @@ module Testcontainers
     def first_mapped_port
       raise ContainerNotStartedError unless @_container
       container_ports.map { |port| mapped_port(port) }.first
+    end
+
+    # Returns the container's mounts.
+    #
+    # @return [Array<Hash>] An array of the container's mounts.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    def mounts
+      info["Mounts"]
+    end
+
+    # Returns the container's mount names.
+    #
+    # @return [Array<String>] The container's mount names.
+    # @raise [ConnectionError] If the connection to the Docker daemon fails.
+    # @raise [ContainerNotStartedError] If the container has not been started.
+    def mount_names
+      mounts.map { |mount| mount["Name"] }
     end
 
     # Returns the value for the given environment variable.

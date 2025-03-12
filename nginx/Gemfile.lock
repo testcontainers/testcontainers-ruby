@@ -1,14 +1,14 @@
 PATH
   remote: ../core
   specs:
-    testcontainers-core (0.1.2)
+    testcontainers-core (0.2.0)
       docker-api (~> 2.2)
 
 PATH
   remote: .
   specs:
-    testcontainers-nginx (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-nginx (0.2.0)
+      testcontainers-core (~> 0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -63,6 +63,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  ruby
 
 DEPENDENCIES
   minitest (~> 5.0)

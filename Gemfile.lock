@@ -1,68 +1,91 @@
 PATH
   remote: .
   specs:
-    testcontainers (0.1.2)
-      testcontainers-core (= 0.1.2)
+    testcontainers (0.2.0)
+      testcontainers-core (= 0.2.0)
+
+PATH
+  remote: compose
+  specs:
+    testcontainers-compose (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: core
   specs:
-    testcontainers-core (0.1.2)
+    testcontainers-core (0.2.0)
       docker-api (~> 2.2)
 
 PATH
   remote: elasticsearch
   specs:
-    testcontainers-elasticsearch (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-elasticsearch (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: mariadb
   specs:
-    testcontainers-mariadb (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-mariadb (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: mongo
   specs:
-    testcontainers-mongo (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-mongo (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: mysql
   specs:
-    testcontainers-mysql (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-mysql (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: nginx
   specs:
-    testcontainers-nginx (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-nginx (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: postgres
   specs:
-    testcontainers-postgres (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-postgres (0.2.0)
+      testcontainers-core (~> 0.1)
+
+PATH
+  remote: rabbitmq
+  specs:
+    testcontainers-rabbitmq (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: redis
   specs:
-    testcontainers-redis (0.1.1)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-redis (0.2.0)
+      testcontainers-core (~> 0.1)
 
 PATH
   remote: redpanda
   specs:
-    testcontainers-redpanda (0.1.0)
-      testcontainers-core (~> 0.1.2)
+    testcontainers-redpanda (0.2.0)
+      testcontainers-core (~> 0.1)
+
+PATH
+  remote: selenium
+  specs:
+    testcontainers-selenium (0.2.0)
+      testcontainers-core (~> 0.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    amq-protocol (2.3.2)
     ast (2.4.2)
     bson (4.15.0)
+    bunny (2.20.3)
+      amq-protocol (~> 2.3, >= 2.3.1)
+      sorted_set (~> 1, >= 1.0.2)
+    childprocess (4.1.0)
     connection_pool (2.4.0)
     docker-api (2.2.0)
       excon (>= 0.47.0)
@@ -98,6 +121,7 @@ GEM
     pg (1.5.3)
     rainbow (3.1.1)
     rake (13.0.6)
+    rbtree (0.4.6)
     rdkafka (0.12.0)
       ffi (~> 1.15)
       mini_portile2 (~> 2.6)
@@ -107,7 +131,7 @@ GEM
     redis-client (0.14.1)
       connection_pool
     regexp_parser (2.8.0)
-    rexml (3.2.5)
+    rexml (3.3.9)
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -125,6 +149,15 @@ GEM
       rubocop-ast (>= 0.4.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
+    rubyzip (2.3.2)
+    selenium-webdriver (4.1.0)
+      childprocess (>= 0.5, < 5.0)
+      rexml (~> 3.2, >= 3.2.5)
+      rubyzip (>= 1.2.2)
+    set (1.0.3)
+    sorted_set (1.0.3)
+      rbtree
+      set (~> 1.0)
     standard (1.28.2)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -137,16 +170,18 @@ GEM
       lint_roller (~> 1.0)
       rubocop-performance (~> 1.16.0)
     unicode-display_width (2.4.2)
-    yard (0.9.34)
+    yard (0.9.36)
 
 PLATFORMS
   -darwin-21
   arm64-darwin-21
   arm64-darwin-22
+  ruby
   x86_64-darwin-22
   x86_64-linux
 
 DEPENDENCIES
+  bunny (>= 2.19.0)
   elasticsearch (~> 8.7)
   minitest (~> 5.0)
   minitest-hooks (~> 1.5)
@@ -156,8 +191,10 @@ DEPENDENCIES
   rake (~> 13.0)
   rdkafka (~> 0.12)
   redis (~> 5.0)
+  selenium-webdriver (~> 4.1.0)
   standard (~> 1.3)
   testcontainers!
+  testcontainers-compose!
   testcontainers-core!
   testcontainers-elasticsearch!
   testcontainers-mariadb!
@@ -165,8 +202,10 @@ DEPENDENCIES
   testcontainers-mysql!
   testcontainers-nginx!
   testcontainers-postgres!
+  testcontainers-rabbitmq!
   testcontainers-redis!
   testcontainers-redpanda!
+  testcontainers-selenium!
   yard (~> 0.9)
 
 BUNDLED WITH
