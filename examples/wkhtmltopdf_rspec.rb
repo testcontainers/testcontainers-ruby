@@ -5,7 +5,6 @@ gemfile do
   gem "rspec"
   gem "wkhtmltopdf-binary"
   gem "testcontainers-core", path: "../core", require: "testcontainers"
-
   group :test do
     gem "webmock"
   end
@@ -26,35 +25,50 @@ end
 
 describe "Wkhtmltopdf Example" do
   let(:url) { "https://getbootstrap.com/docs/5.3/examples/sticky-footer/" }
-  let(:pdfs_path) { "#{__dir__}/tmp:/tmp:rw" }
-  let(:command) { [url, file_name] }
-  let(:file_name) { "/tmp/document.pdf" }
-  let(:file_path) { "#{__dir__}#{file_name}" }
+  let(:host_tmp_dir) { "#{__dir__}/tmp" }
+  let(:container_tmp_dir) { "/tmp" }
+  let(:file_name) { "document.pdf" }
+  let(:file_path) { "#{host_tmp_dir}/#{file_name}" }
+  let(:container_file_path) { "#{container_tmp_dir}/#{file_name}" }
+  # wkhtmltopdf typically expects 'wkhtmltopdf [url] [output]' as command
   let(:container) do
     Testcontainers::DockerContainer.new("surnet/alpine-wkhtmltopdf:3.17.0-0.12.6-small")
+      .with_entrypoint("wkhtmltopdf")
+      .with_command([url, container_file_path])
   end
 
   before do
+    FileUtils.mkdir_p(host_tmp_dir)
     WebMock.allow_net_connect!
-    container.with_filesystem_binds([pdfs_path])
+    container.with_filesystem_binds(["#{host_tmp_dir}:#{container_tmp_dir}:rw"])
+    stub_request(:get, url).to_return(
+      body: File.read("#{__dir__}/fixtures/web_page/index.html")
+    )
   end
 
   after(:each) do
     WebMock.allow_net_connect!
-    container&.stop
+    if container.running?
+      puts "Container logs: #{container.logs}"
+      container.stop
+    end
     container&.remove
+    FileUtils.rm_f(file_path)
   end
 
   context "when using html" do
-    before(:each) do
-      stub_request(:get, url).to_return(
-        body: File.read("#{__dir__}/fixtures/web_page/index.html")
-      )
-    end
-
     it "generates a PDF page" do
-      container.with_command(command)
       container.start
+      # Wait with a timeout and check periodically
+      10.times do |i|
+        break if File.exist?(file_path)
+        puts "Waiting for PDF (attempt #{i + 1}/10)..."
+        sleep 1
+      end
+
+      puts "Checking for file at: #{file_path}"
+      puts "File exists? #{File.exist?(file_path)}"
+      puts "Directory contents: #{Dir.entries(host_tmp_dir)}"
 
       expect(file_path).to exist_file
     end
