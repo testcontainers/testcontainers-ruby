@@ -1,4 +1,5 @@
-require 'properties-ruby'
+require 'java-properties'
+
 module Testcontainers
   # The DockerContainer class is used to manage Docker containers.
   # It provides an interface to create, start, stop, and manipulate containers
@@ -473,8 +474,9 @@ module Testcontainers
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [NotFoundError] If Docker is unable to find the image.
     def start
-      properties = Utils::Properties.load_from_file(File.expand_path('~/.testcontainers.properties'))
-      tc_host = properties.get(:"tc.host")
+      properties = JavaProperties.load(File.expand_path('~/.testcontainers.properties'))
+
+      tc_host = ENV["TESTCONTAINERS_HOST"] || properties[:"tc.host"]
 
       if tc_host && !tc_host.empty?
         Docker.url = tc_host
