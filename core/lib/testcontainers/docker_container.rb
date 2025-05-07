@@ -1,6 +1,7 @@
 require "java-properties"
 
 module Testcontainers
+
   # The DockerContainer class is used to manage Docker containers.
   # It provides an interface to create, start, stop, and manipulate containers
   # using the Docker API.
@@ -21,8 +22,22 @@ module Testcontainers
   # @attr_reader _container [Docker::Container, nil] the underlying Docker::Container object
   # @attr_reader _id [String, nil] the container's ID
   class DockerContainer
+    class << self
+      def setup_docker
+        expanded_path = File.expand_path("~/.testcontainers.properties")
+
+        properties = File.exist?(expanded_path) ? JavaProperties.load(expanded_path) : {}
+
+        tc_host = ENV["TESTCONTAINERS_HOST"] || properties[:"tc.host"]
+
+        if tc_host && !tc_host.empty?
+          Docker.url = tc_host
+        end
+      end
+    end
+
     attr_accessor :name, :image, :command, :entrypoint, :exposed_ports, :port_bindings, :volumes, :filesystem_binds,
-      :env, :labels, :working_dir, :healthcheck, :wait_for
+                  :env, :labels, :working_dir, :healthcheck, :wait_for, :aliases, :network
     attr_accessor :logger
     attr_reader :_container, :_id
 
@@ -39,9 +54,11 @@ module Testcontainers
     # @param env [Array<String>, Hash, nil] an array or a hash of environment variables for the container in the format KEY=VALUE
     # @param labels [Hash, nil] a hash of labels to be applied to the container
     # @param working_dir [String, nil] the working directory for the container
+    # @param network [Testcontainers::Network, nil] the network to attach the container to
+    # @param aliases [Array<String>, nil] the aliases for the container in the network
     # @param logger [Logger] a logger instance for the container
     def initialize(image, name: nil, command: nil, entrypoint: nil, exposed_ports: nil, image_create_options: {}, port_bindings: nil, volumes: nil, filesystem_binds: nil,
-      env: nil, labels: nil, working_dir: nil, healthcheck: nil, wait_for: nil, logger: Testcontainers.logger)
+                   env: nil, labels: nil, working_dir: nil, healthcheck: nil, wait_for: nil, network: nil, aliases: nil, logger: Testcontainers.logger)
 
       @image = image
       @name = name
@@ -61,6 +78,8 @@ module Testcontainers
       @_container = nil
       @_id = nil
       @_created_at = nil
+      @aliases = aliases
+      @network = network
     end
 
     # Add environment variables to the container configuration.
@@ -87,7 +106,7 @@ module Testcontainers
       @exposed_ports ||= {}
       @port_bindings ||= {}
       @exposed_ports[port] ||= {}
-      @port_bindings[port] ||= [{"HostPort" => ""}]
+      @port_bindings[port] ||= [{ "HostPort" => "" }]
       @exposed_ports
     end
 
@@ -119,7 +138,7 @@ module Testcontainers
       @exposed_ports ||= {}
       @port_bindings ||= {}
       @exposed_ports[container_port] = {}
-      @port_bindings[container_port] = [{"HostPort" => host_port.to_s}]
+      @port_bindings[container_port] = [{ "HostPort" => host_port.to_s }]
       @port_bindings
     end
 
@@ -229,7 +248,7 @@ module Testcontainers
       test = options[:test]
 
       if test.nil?
-        @healthcheck = {"Test" => ["NONE"]}
+        @healthcheck = { "Test" => ["NONE"] }
         return @healthcheck
       end
 
@@ -457,6 +476,34 @@ module Testcontainers
       self
     end
 
+    # Returns the container's ID.
+    #
+    def id
+      @_id
+    end
+
+    # Returns the container's aliases within the network.
+    #
+    def aliases
+      @aliases ||= []
+    end
+
+    # Sets the container's network.
+    #
+    # @param network [Testcontainers::Network] The network to attach the container to.
+    def with_network(network)
+      @network = network
+      self
+    end
+
+    # Sets the container's network aliases.
+    #
+    # @param aliases [Array<String>] The aliases for the container in the network.
+    def with_network_aliases(*aliases)
+      self.aliases += aliases&.flatten
+      self
+    end
+
     # Starts the container, yields the container instance to the block, and stops the container.
     #
     # @yield [DockerContainer] The container instance.
@@ -474,19 +521,13 @@ module Testcontainers
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [NotFoundError] If Docker is unable to find the image.
     def start
-      expanded_path = File.expand_path("~/.testcontainers.properties")
-
-      properties = File.exist?(expanded_path) ? JavaProperties.load(expanded_path) : {}
-
-      tc_host = ENV["TESTCONTAINERS_HOST"] || properties[:"tc.host"]
-
-      if tc_host && !tc_host.empty?
-        Docker.url = tc_host
-      end
+      self.class.setup_docker
 
       connection = Docker::Connection.new(Docker.url, Docker.options)
 
-      Docker::Image.create({"fromImage" => @image}.merge(@image_create_options), connection)
+      @network&.create
+
+      Docker::Image.create({ "fromImage" => @image }.merge(@image_create_options), connection)
 
       @_container ||= Docker::Container.create(_container_create_options)
       @_container.start
@@ -516,6 +557,7 @@ module Testcontainers
     def stop(force: false)
       raise ContainerNotStartedError unless @_container
       @_container.stop(force: force)
+      @network&.close
       self
     rescue Excon::Error::Socket => e
       raise ConnectionError, e.message
@@ -1026,7 +1068,7 @@ module Testcontainers
       return port_bindings if port_bindings.is_a?(Hash) && port_bindings.values.all? { |v| v.is_a?(Array) }
 
       port_bindings.each_with_object({}) do |(container_port, host_port), hash|
-        hash[normalize_port(container_port)] = [{"HostPort" => host_port.to_s}]
+        hash[normalize_port(container_port)] = [{ "HostPort" => host_port.to_s }]
       end
     end
 
@@ -1126,6 +1168,10 @@ module Testcontainers
       nil
     end
 
+    def network_name
+      @network_name ||= network&.name
+    end
+
     def _container_create_options
       {
         "name" => @name,
@@ -1139,10 +1185,23 @@ module Testcontainers
         "WorkingDir" => @working_dir,
         "Healthcheck" => @healthcheck,
         "HostConfig" => {
+          "NetworkMode" => network_name,
           "PortBindings" => @port_bindings,
           "Binds" => @filesystem_binds
-        }.compact
+        }.compact,
+        "NetworkingConfig": _networking_config
       }.compact
+    end
+
+    def _networking_config
+      return nil unless network_name && !aliases&.empty?
+      {
+        "EndpointsConfig" => {
+          network_name => {
+            "Aliases" => aliases
+          }
+        }
+      }
     end
   end
 

@@ -454,4 +454,43 @@ class DockerContainerTest < TestcontainersTest
     tempfile.unlink
     tempfile.close
   end
+
+  def test_it_connects_a_container_to_a_custom_network
+    network = Testcontainers::Network.new_network
+
+    container = Testcontainers::DockerContainer.new("hello-world").with_network(network)
+    container.start
+
+    assert container_connected?(container, container.network.name)
+  ensure
+    container.stop if container.exists? && container.running?
+    container.remove({ v: true }) if container.exists?
+    network&.close
+  end
+
+  def test_it_sets_all_aliases_for_a_container
+    network = Testcontainers::Network.new_network
+
+    container = Testcontainers::DockerContainer.new("hello-world")
+                                               .with_network(network)
+                                               .with_network_aliases("alias1", "alias2")
+
+    container.start
+
+    assert_equal ["alias1", "alias2"].sort, all_aliases(container).sort
+  ensure
+    container.stop if container.exists? && container.running?
+    container.remove({ v: true }) if container.exists?
+    network&.close
+  end
+
+  def container_connected?(container, network_name)
+    networks = container.info["NetworkSettings"]["Networks"] || {}
+    networks.key?(network_name)
+  end
+
+  def all_aliases(container)
+    networks = container.info.dig("NetworkSettings", "Networks") || {}
+    networks.values.flat_map { |cfg| cfg["Aliases"] }.compact.uniq
+  end
 end

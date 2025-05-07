@@ -37,6 +37,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_development_dependency "minitest-hooks", "~> 1.5"
   spec.add_development_dependency "standard", "~> 1.3"
+  spec.add_development_dependency "base64", "~> 0.2.0"
+  spec.add_development_dependency "mutex_m", "~> 0.3.0"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
