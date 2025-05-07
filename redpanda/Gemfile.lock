@@ -3,6 +3,7 @@ PATH
   specs:
     testcontainers-core (0.2.0)
       docker-api (~> 2.2)
+      java-properties (~> 0.3.0)
 
 PATH
   remote: .
@@ -19,6 +20,7 @@ GEM
       multi_json
     excon (0.99.0)
     ffi (1.15.5)
+    java-properties (0.3.0)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     lint_roller (1.0.0)
@@ -37,8 +39,7 @@ GEM
       mini_portile2 (~> 2.6)
       rake (> 12)
     regexp_parser (2.8.0)
-    rexml (3.3.6)
-      strscan
+    rexml (3.3.9)
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -66,7 +67,6 @@ GEM
     standard-performance (1.0.1)
       lint_roller (~> 1.0)
       rubocop-performance (~> 1.16.0)
-    strscan (3.1.0)
     unicode-display_width (2.4.2)
 
 PLATFORMS
