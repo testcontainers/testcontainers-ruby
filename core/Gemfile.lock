@@ -3,6 +3,7 @@ PATH
   specs:
     testcontainers-core (0.2.0)
       docker-api (~> 2.2)
+      java-properties (~> 0.3.0)
 
 GEM
   remote: https://rubygems.org/
@@ -12,6 +13,7 @@ GEM
       excon (>= 0.47.0)
       multi_json
     excon (0.99.0)
+    java-properties (0.3.0)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     lint_roller (1.0.0)
