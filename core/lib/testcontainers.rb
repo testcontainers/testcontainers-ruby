@@ -5,6 +5,7 @@ require "logger"
 require "open3"
 require "uri"
 require "testcontainers/docker_container"
+require "testcontainers/network"
 require_relative "testcontainers/version"
 
 module Testcontainers
