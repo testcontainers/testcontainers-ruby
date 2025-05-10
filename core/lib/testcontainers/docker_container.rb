@@ -1124,11 +1124,15 @@ module Testcontainers
     end
 
     def container_bridge_ip
-      @_container&.json&.dig("NetworkSettings", "Networks", "bridge", "IPAddress")
+      network_settings&.dig("IPAddress")
     end
 
     def container_gateway_ip
-      @_container&.json&.dig("NetworkSettings", "Networks", "bridge", "Gateway")
+      network_settings&.dig("Gateway")
+    end
+
+    def network_settings
+      @_container&.json&.dig("NetworkSettings", "Networks", network&.name || "bridge")
     end
 
     def container_port(port)
