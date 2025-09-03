@@ -127,7 +127,7 @@ module Testcontainers
     end
 
     def _default_healthcheck_options
-      {test: ["/usr/bin/mysql", "--protocol=TCP", "--port=#{port}", "--user=#{username}", "--password=#{password}", database, "--silent", "--execute=SELECT 1;"], interval: 1, timeout: 5, retries: 5}
+      {test: ["/usr/bin/mysql", "--protocol=TCP", "--port=#{port}", "--user=#{username}", "--password=#{password}", database, "--silent", "--execute=SELECT(1);"], interval: 1, timeout: 5, retries: 5}
     end
   end
 end
