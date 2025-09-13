@@ -103,6 +103,7 @@ module Testcontainers
 
     def _configure
       add_env("POSTGRES_DATABASE", @database)
+      add_env("POSTGRES_DB", @database)
       add_env("POSTGRES_USER", @username)
 
       raise ContainerLaunchException, "Password is required for non-root users" if @password.nil? || @password.empty?

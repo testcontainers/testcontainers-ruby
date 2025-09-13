@@ -37,6 +37,7 @@ class PostgresContainerTest < TestcontainersTest
 
   def test_it_is_configured_with_the_default_environment_variables
     assert "test", @container.get_env("POSTGRES_DATABASE")
+    assert "test", @container.get_env("POSTGRES_DB")
     assert "test", @container.get_env("POSTGRES_USER")
     assert "test", @container.get_env("POSTGRES_PASSWORD")
     assert "test", @container.get_env("POSTGRES_ROOT_PASSWORD")
