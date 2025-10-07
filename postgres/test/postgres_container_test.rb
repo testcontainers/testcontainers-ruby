@@ -90,7 +90,7 @@ class PostgresContainerTest < TestcontainersTest
 
   def test_it_uses_wait_for_healthcheck_by_default_when_port_bindings_are_specified
     expected_wait_for = Testcontainers::PostgresContainer.new(wait_for: :healthcheck).wait_for
-    actual_wait_for = Testcontainers::PostgresContainer.new(port_bindings: { '5432': '15432' }).wait_for
+    actual_wait_for = Testcontainers::PostgresContainer.new(port_bindings: {"5432": "15432"}).wait_for
 
     assert_equal expected_wait_for.source_location, actual_wait_for.source_location
   end
