@@ -37,6 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest-hooks", "~> 1.5"
   spec.add_development_dependency "standard", "~> 1.3"
   spec.add_development_dependency "mongo", "~> 2.2"
+  spec.add_development_dependency "bigdecimal", "~> 3.1"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
