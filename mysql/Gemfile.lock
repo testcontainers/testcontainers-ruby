@@ -17,6 +17,7 @@ GEM
   specs:
     ast (2.4.3)
     base64 (0.3.0)
+    bigdecimal (3.3.1)
     docker-api (2.2.0)
       excon (>= 0.47.0)
       multi_json
@@ -29,7 +30,8 @@ GEM
     minitest-hooks (1.5.0)
       minitest (> 5.3)
     multi_json (1.15.0)
-    mysql2 (0.5.5)
+    mysql2 (0.5.7)
+      bigdecimal
     parallel (1.27.0)
     parser (3.3.9.0)
       ast (~> 2.4.1)

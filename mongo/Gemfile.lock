@@ -17,7 +17,7 @@ GEM
   specs:
     ast (2.4.3)
     base64 (0.3.0)
-    bson (4.15.0)
+    bson (5.2.0)
     docker-api (2.2.0)
       excon (>= 0.47.0)
       multi_json
@@ -29,8 +29,9 @@ GEM
     minitest (5.26.0)
     minitest-hooks (1.5.0)
       minitest (> 5.3)
-    mongo (2.18.2)
-      bson (>= 4.14.1, < 5.0.0)
+    mongo (2.21.3)
+      base64
+      bson (>= 4.14.1, < 6.0.0)
     multi_json (1.15.0)
     parallel (1.27.0)
     parser (3.3.9.0)
