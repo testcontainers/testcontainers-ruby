@@ -135,7 +135,7 @@ GEM
     redis-client (0.14.1)
       connection_pool
     regexp_parser (2.8.0)
-    rexml (3.3.9)
+    rexml (3.4.4)
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
