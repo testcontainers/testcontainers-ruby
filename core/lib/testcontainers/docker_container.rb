@@ -52,7 +52,9 @@ module Testcontainers
       @volumes = add_volumes(volumes) if volumes
       @env = add_env(env) if env
       @filesystem_binds = add_filesystem_binds(filesystem_binds) if filesystem_binds
-      @labels = add_labels(labels) if labels
+      @labels = {}
+      add_labels(default_labels)
+      add_labels(labels) if labels
       @working_dir = working_dir
       @healthcheck = add_healthcheck(healthcheck) if healthcheck
       @wait_for = add_wait_for(wait_for)
@@ -1004,6 +1006,13 @@ module Testcontainers
     end
 
     private
+
+    def default_labels
+      {
+        "org.testcontainers.lang" => "ruby",
+        "org.testcontainers.version" => Testcontainers::VERSION
+      }
+    end
 
     def normalize_ports(ports)
       return if ports.nil?

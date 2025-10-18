@@ -110,7 +110,7 @@ class DockerContainerTest < TestcontainersTest
 
   def test_it_returns_the_container_labels
     container = Testcontainers::DockerContainer.new("hello-world", labels: {"foo" => "bar"})
-    assert_equal({"foo" => "bar"}, container.labels)
+    assert_equal({"org.testcontainers.lang" => "ruby", "org.testcontainers.version" => "0.2.0", "foo" => "bar"}, container.labels)
   end
 
   def test_it_returns_the_container_env
@@ -182,7 +182,7 @@ class DockerContainerTest < TestcontainersTest
     container = Testcontainers::DockerContainer.new("hello-world")
     container.add_label("foo", "bar")
 
-    assert_equal({"foo" => "bar"}, container.labels)
+    assert_equal({"org.testcontainers.lang" => "ruby", "org.testcontainers.version" => "0.2.0", "foo" => "bar"}, container.labels)
   end
 
   def test_it_adds_a_wait_for_with_default
@@ -234,7 +234,7 @@ class DockerContainerTest < TestcontainersTest
     assert_equal({"80/tcp" => [{"HostPort" => "8080"}], "443/tcp" => [{"HostPort" => ""}]}, container.port_bindings)
     assert_equal({"/tmp" => {}, "/root" => {}}, container.volumes)
     assert_equal(["/tmp/docker:/tmp:rw", "/home/user:/root:rw"], container.filesystem_binds)
-    assert_equal({"foo" => "bar"}, container.labels)
+    assert_equal({"org.testcontainers.lang" => "ruby", "org.testcontainers.version" => "0.2.0", "foo" => "bar"}, container.labels)
     assert_equal(["PATH=/usr/bin"], container.env)
     assert_equal("/app", container.working_dir)
     assert_kind_of(Proc, container.wait_for)
