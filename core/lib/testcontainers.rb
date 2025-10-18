@@ -31,4 +31,9 @@ module Testcontainers
       @logger ||= Logger.new($stdout, level: :info)
     end
   end
+
+  # Configure Docker API with custom User-Agent
+  Docker.options ||= {}
+  Docker.options[:headers] ||= {}
+  Docker.options[:headers]["User-Agent"] = "tc-ruby/#{VERSION}"
 end
