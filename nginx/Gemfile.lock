@@ -2,7 +2,9 @@ PATH
   remote: ../core
   specs:
     testcontainers-core (0.2.0)
+      base64 (~> 0.3)
       docker-api (~> 2.2)
+      java-properties (~> 0.3.0)
 
 PATH
   remote: .
@@ -14,10 +16,12 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
+    base64 (0.3.0)
     docker-api (2.2.0)
       excon (>= 0.47.0)
       multi_json
     excon (0.99.0)
+    java-properties (0.3.0)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     lint_roller (1.0.0)
@@ -31,7 +35,7 @@ GEM
     rainbow (3.1.1)
     rake (13.0.6)
     regexp_parser (2.8.0)
-    rexml (3.2.5)
+    rexml (3.4.4)
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
