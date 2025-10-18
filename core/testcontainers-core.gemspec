@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "docker-api", "~> 2.2"
   spec.add_dependency "java-properties", "~> 0.3.0"
+  spec.add_dependency "base64", "~> 0.3"
 
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "minitest", "~> 5.0"
