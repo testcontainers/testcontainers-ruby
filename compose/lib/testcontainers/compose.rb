@@ -26,7 +26,6 @@ module Testcontainers
     # @param services [List] are the names of the services that gonna use in the images of the containers
     def initialize(command: ["docker compose"], filepath: ".", compose_filenames: ["docker-compose.yml"],
       pull: false, build: false, env_file: nil, services: nil)
-
       @command = command
       @filepath = filepath
       @compose_filenames = compose_filenames

@@ -17,7 +17,7 @@ module Testcontainers
     # @param kwargs [Hash] the options to pass to the container. See {DockerContainer#initialize}
     # @return [RedisContainer] a new instance of RedisContainer
     def initialize(image = REDIS_DEFAULT_IMAGE, **kwargs)
-      super(image, **kwargs)
+      super
       @wait_for ||= add_wait_for(:logs, /Ready to accept connections/)
     end
 

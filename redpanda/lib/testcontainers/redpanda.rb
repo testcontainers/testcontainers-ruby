@@ -22,7 +22,7 @@ module Testcontainers
     # @param kwargs [Hash] the options to pass to the container. See {DockerContainer#initialize}
     # @return [RedpandaContainer] a new instance of RedpandaContainer
     def initialize(image = REDPANDA_DEFAULT_IMAGE, **kwargs)
-      super(image, **kwargs)
+      super
     end
 
     # Starts the container

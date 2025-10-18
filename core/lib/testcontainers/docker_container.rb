@@ -42,7 +42,6 @@ module Testcontainers
     # @param logger [Logger] a logger instance for the container
     def initialize(image, name: nil, command: nil, entrypoint: nil, exposed_ports: nil, image_create_options: {}, port_bindings: nil, volumes: nil, filesystem_binds: nil,
       env: nil, labels: nil, working_dir: nil, healthcheck: nil, wait_for: nil, logger: Testcontainers.logger)
-
       @image = image
       @name = name
       @command = command
@@ -276,7 +275,7 @@ module Testcontainers
           raise ArgumentError, "Invalid wait_for method: #{method}"
         end
       elsif method.is_a?(Array)
-        method_name = "wait_for_#{method[0]}".to_sym
+        method_name = :"wait_for_#{method[0]}"
         args = method[1] || []
         kwargs = method[2] || {}
         if respond_to?(method_name)
@@ -285,7 +284,7 @@ module Testcontainers
           raise ArgumentError, "Invalid wait_for method: #{method_name}"
         end
       else
-        method_name = "wait_for_#{method}".to_sym
+        method_name = :"wait_for_#{method}"
         if respond_to?(method_name)
           @wait_for = ->(container) { container.send(method_name, *args, **kwargs) }
         else
@@ -1102,7 +1101,7 @@ module Testcontainers
       cmd = "ip route | awk '/default/ { print $3 }'"
 
       ip_address, _stderr, status = Open3.capture3(cmd)
-      return ip_address.strip if ip_address && status.success?
+      ip_address.strip if ip_address && status.success?
     rescue
       nil
     end
@@ -1117,7 +1116,7 @@ module Testcontainers
       when "unix", "npipe"
         if inside_container?
           ip_address = default_gateway_ip
-          return ip_address if ip_address
+          ip_address if ip_address
         end
       else
         "localhost"
