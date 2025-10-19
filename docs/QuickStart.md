@@ -71,3 +71,32 @@ end
 With these changes, your test suite will automatically start a new Redis container for each test, ensuring a clean and isolated environment. The container will be stopped after each test is completed. You can re-use containers between tests as well (e.g using `after(:suite)` / `before(:suite)` blocks in RSpec).
 
 Take a look to the files [examples/redis_backed_cache_minitest.rb](https://github.com/testcontainers/testcontainers-ruby/blob/main/examples/redis_backed_cache_minitest.rb) and [examples/redis_backed_cache_rspec.rb](https://github.com/testcontainers/testcontainers-ruby/blob/main/examples/redis_backed_cache_rspec.rb) for full examples.
+
+## Configuring the Docker client
+
+Testcontainers automatically configures the Docker client the first time it is needed. It sets a descriptive `User-Agent` header and looks for the Docker daemon URL in the following order:
+
+1. `ENV["TESTCONTAINERS_HOST"]`
+2. `~/.testcontainers.properties` (`tc.host` key)
+3. Docker’s defaults (e.g. `/var/run/docker.sock`)
+
+If you need to configure the client explicitly before creating containers—for example in a test helper—you can call:
+
+```ruby
+Testcontainers::DockerClient.configure
+```
+
+You may also update the environment variable or properties file before invoking `configure` to point at a remote Docker host.
+
+### Shared container networks
+
+When multiple containers need to communicate, you can attach them to the built-in shared network:
+
+```ruby
+network = Testcontainers::Network::SHARED
+
+redis = Testcontainers::DockerContainer.new("redis:6.2-alpine").with_network(network)
+nginx = Testcontainers::DockerContainer.new("nginx:alpine").with_network(network)
+```
+
+`Testcontainers::Network::SHARED` is a singleton that remains available for the lifetime of your test suite, and the library cleans it up automatically when the process exits. You can still create additional ad-hoc networks with `Testcontainers::Network.new_network` when you need isolated environments.

@@ -1,5 +1,3 @@
-require "java-properties"
-
 module Testcontainers
   # The DockerContainer class is used to manage Docker containers.
   # It provides an interface to create, start, stop, and manipulate containers
@@ -24,7 +22,7 @@ module Testcontainers
     attr_accessor :name, :image, :command, :entrypoint, :exposed_ports, :port_bindings, :volumes, :filesystem_binds,
       :env, :labels, :working_dir, :healthcheck, :wait_for
     attr_accessor :logger
-    attr_reader :_container, :_id
+    attr_reader :_container, :_id, :networks
 
     # Initializes a new DockerContainer instance.
     #
@@ -62,6 +60,8 @@ module Testcontainers
       @_container = nil
       @_id = nil
       @_created_at = nil
+      @networks = {}
+      @pending_network_aliases = []
     end
 
     # Add environment variables to the container configuration.
@@ -458,6 +458,34 @@ module Testcontainers
       self
     end
 
+    # Attach the container to a Docker network.
+    #
+    # @param network [String, Docker::Network, Testcontainers::Network] The network to attach to.
+    # @param aliases [Array<String>, nil] Optional aliases for the container on this network.
+    # @return [DockerContainer] The updated DockerContainer instance.
+    def with_network(network, aliases: nil)
+      add_network(network, aliases: aliases)
+      self
+    end
+
+    # Attach the container to multiple Docker networks.
+    #
+    # @param networks [Array<String, Docker::Network, Testcontainers::Network>] Networks to attach.
+    # @return [DockerContainer] The updated DockerContainer instance.
+    def with_networks(*networks)
+      networks.flatten.compact.each { |net| add_network(net) }
+      self
+    end
+
+    # Assign aliases for the container on its primary network.
+    #
+    # @param aliases [Array<String>] Aliases to add.
+    # @return [DockerContainer] The updated DockerContainer instance.
+    def with_network_aliases(*aliases)
+      add_network_aliases(aliases)
+      self
+    end
+
     # Starts the container, yields the container instance to the block, and stops the container.
     #
     # @yield [DockerContainer] The container instance.
@@ -475,17 +503,7 @@ module Testcontainers
     # @raise [ConnectionError] If the connection to the Docker daemon fails.
     # @raise [NotFoundError] If Docker is unable to find the image.
     def start
-      expanded_path = File.expand_path("~/.testcontainers.properties")
-
-      properties = File.exist?(expanded_path) ? JavaProperties.load(expanded_path) : {}
-
-      tc_host = ENV["TESTCONTAINERS_HOST"] || properties[:"tc.host"]
-
-      if tc_host && !tc_host.empty?
-        Docker.url = tc_host
-      end
-
-      connection = Docker::Connection.new(Docker.url, Docker.options)
+      connection = Testcontainers::DockerClient.connection
 
       image_options = {"fromImage" => @image}.merge(@image_create_options)
       image_reference = (image_options["fromImage"] || image_options[:fromImage] || @image).to_s
@@ -500,7 +518,9 @@ module Testcontainers
         Docker::Image.create(image_options, connection)
       end
 
-      @_container ||= Docker::Container.create(_container_create_options)
+      ensure_networks_created
+
+      @_container ||= Docker::Container.create(_container_create_options, connection)
       @_container.start
 
       @_id = @_container.id
@@ -1101,11 +1121,13 @@ module Testcontainers
     end
 
     def container_bridge_ip
-      @_container&.json&.dig("NetworkSettings", "Networks", "bridge", "IPAddress")
+      network_key = primary_network_name || "bridge"
+      @_container&.json&.dig("NetworkSettings", "Networks", network_key, "IPAddress")
     end
 
     def container_gateway_ip
-      @_container&.json&.dig("NetworkSettings", "Networks", "bridge", "Gateway")
+      network_key = primary_network_name || "bridge"
+      @_container&.json&.dig("NetworkSettings", "Networks", network_key, "Gateway")
     end
 
     def container_port(port)
@@ -1157,11 +1179,109 @@ module Testcontainers
         "Labels" => @labels,
         "WorkingDir" => @working_dir,
         "Healthcheck" => @healthcheck,
-        "HostConfig" => {
-          "PortBindings" => @port_bindings,
-          "Binds" => @filesystem_binds
-        }.compact
-      }.compact
+        "HostConfig" => host_config_options.compact
+      }.compact.tap do |options|
+        networking = networking_config
+        options["NetworkingConfig"] = networking if networking
+      end
+    end
+
+    def host_config_options
+      host_config = {
+        "PortBindings" => @port_bindings,
+        "Binds" => @filesystem_binds
+      }
+
+      primary = primary_network_name
+      host_config["NetworkMode"] = primary if primary
+
+      host_config
+    end
+
+    def networking_config
+      return if @networks.nil? || @networks.empty?
+
+      endpoints = {}
+      @networks.each do |name, config|
+        endpoint = {}
+        aliases = config[:aliases]
+        endpoint["Aliases"] = aliases if aliases && !aliases.empty?
+        endpoints[name] = endpoint
+      end
+
+      return if endpoints.empty?
+
+      {"EndpointsConfig" => endpoints}
+    end
+
+    def primary_network_name
+      return nil if @networks.nil? || @networks.empty?
+
+      @networks.keys.first
+    end
+
+    def add_network(network, aliases: nil)
+      name, network_object = resolve_network(network)
+      @networks[name] ||= {aliases: [], object: network_object}
+      @networks[name][:object] ||= network_object if network_object
+
+      new_aliases = normalize_aliases(aliases)
+      unless new_aliases.empty?
+        @networks[name][:aliases] = (@networks[name][:aliases] + new_aliases).uniq
+      end
+
+      if @networks.length == 1 && @pending_network_aliases.any?
+        @networks[name][:aliases] = (@networks[name][:aliases] + @pending_network_aliases).uniq
+        @pending_network_aliases.clear
+      end
+
+      self
+    end
+
+    def add_network_aliases(aliases)
+      normalized = normalize_aliases(aliases)
+      return if normalized.empty?
+
+      if @networks.nil? || @networks.empty?
+        @pending_network_aliases = (@pending_network_aliases + normalized).uniq
+      else
+        primary = primary_network_name
+        @networks[primary][:aliases] = (@networks[primary][:aliases] + normalized).uniq
+      end
+    end
+
+    def normalize_aliases(aliases)
+      Array(aliases).flatten.compact.filter_map do |alias_value|
+        value = alias_value.to_s.strip
+        value unless value.empty?
+      end.uniq
+    end
+
+    def resolve_network(network)
+      case network
+      when Testcontainers::Network
+        network.create
+        [network.name, network]
+      when Docker::Network
+        info = network.info || {}
+        name = info["Name"] || network.id
+        [name, network]
+      when String
+        [network, nil]
+      else
+        raise ArgumentError, "Unsupported network type: #{network.inspect}"
+      end
+    end
+
+    def ensure_networks_created
+      return if @networks.nil? || @networks.empty?
+
+      @networks.each_value do |config|
+        network_object = config[:object]
+        next unless network_object
+
+        network_object.create if network_object.respond_to?(:create)
+      end
     end
   end
 
