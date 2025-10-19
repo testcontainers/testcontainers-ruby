@@ -17,6 +17,7 @@ GEM
   specs:
     ast (2.4.3)
     base64 (0.3.0)
+    bigdecimal (3.3.1)
     bson (5.2.0)
     docker-api (2.4.0)
       excon (>= 0.64.0)
@@ -83,6 +84,7 @@ PLATFORMS
   x86_64-darwin-22
 
 DEPENDENCIES
+  bigdecimal (~> 3.3)
   minitest (~> 5.0)
   minitest-hooks (~> 1.5)
   mongo (~> 2.2)
