@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "tmpdir"
+require "securerandom"
 
 class DockerContainerTest < TestcontainersTest
   def before_all
@@ -42,6 +44,38 @@ class DockerContainerTest < TestcontainersTest
     good_container.remove if good_container.exists?
     bad_container.stop if bad_container.exists? && bad_container.running?
     bad_container.remove if bad_container.exists?
+  end
+
+  def test_it_uses_locally_built_image_before_pulling
+    image_repo = "testcontainers-local-#{SecureRandom.hex(6)}"
+    image_tag = "latest"
+    image_reference = "#{image_repo}:#{image_tag}"
+    container = nil
+
+    Dir.mktmpdir do |dir|
+      dockerfile_path = File.join(dir, "Dockerfile")
+      File.write(dockerfile_path, <<~DOCKERFILE)
+        FROM alpine:latest
+        CMD ["sleep", "60"]
+      DOCKERFILE
+
+      Docker::Image.build_from_dir(dir, {"t" => image_reference, "dockerfile" => "Dockerfile"})
+    end
+
+    container = Testcontainers::DockerContainer.new(image_reference)
+    container.start
+
+    assert container.running?
+  ensure
+    if container
+      container.stop if container.running?
+      container.remove if container.exists?
+    end
+    begin
+      Docker::Image.get(image_reference).remove(force: true)
+    rescue Docker::Error::NotFoundError
+      # image already removed
+    end
   end
 
   def test_it_returns_the_container_image
