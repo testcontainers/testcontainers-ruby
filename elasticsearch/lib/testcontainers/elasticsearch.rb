@@ -30,7 +30,7 @@ module Testcontainers
       @username = username || ELASTICSEARCH_DEFAULT_USERNAME
       @password = password || ELASTICSEARCH_DEFAULT_PASSWORD
       @healthcheck ||= add_healthcheck(_default_healthcheck_options)
-      @wait_for ||= add_wait_for(:healthcheck)
+      add_wait_for(:healthcheck) unless wait_for_user_defined?
     end
 
     # Starts the container

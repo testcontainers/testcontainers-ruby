@@ -5,6 +5,7 @@ PATH
       base64 (~> 0.3)
       docker-api (~> 2.4)
       java-properties (~> 0.3.0)
+      mutex_m (~> 0.3)
 
 PATH
   remote: .
@@ -18,8 +19,8 @@ GEM
     ast (2.4.3)
     base64 (0.3.0)
     bigdecimal (3.3.1)
-    docker-api (2.2.0)
-      excon (>= 0.47.0)
+    docker-api (2.4.0)
+      excon (>= 0.64.0)
       multi_json
     excon (0.99.0)
     java-properties (0.3.0)
@@ -30,6 +31,7 @@ GEM
     minitest-hooks (1.5.0)
       minitest (> 5.3)
     multi_json (1.15.0)
+    mutex_m (0.3.0)
     mysql2 (0.5.7)
       bigdecimal
     parallel (1.27.0)

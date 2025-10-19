@@ -29,7 +29,7 @@ module Testcontainers
       @vnc_password = vnc_password
       @vnc_no_password = vnc_no_password
       @headless = headless
-      @wait_for ||= add_wait_for(:logs, /Started Selenium/)
+      add_wait_for(:logs, /Started Selenium/) unless wait_for_user_defined?
     end
 
     # Starts the container

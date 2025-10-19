@@ -55,6 +55,7 @@ module Testcontainers
       add_labels(labels) if labels
       @working_dir = working_dir
       @healthcheck = add_healthcheck(healthcheck) if healthcheck
+      @wait_for_user_defined = false
       @wait_for = add_wait_for(wait_for)
       @logger = logger
       @_container = nil
@@ -263,16 +264,19 @@ module Testcontainers
         if block
           if block.arity == 1
             @wait_for = block
+            @wait_for_user_defined = true
           else
             raise ArgumentError, "Invalid wait_for block: #{block}"
           end
         elsif @exposed_ports && !@exposed_ports.empty?
           port = @exposed_ports.keys.first.split("/").first
           @wait_for = ->(container) { container.wait_for_tcp_port(port) }
+          @wait_for_user_defined ||= false
         end
       elsif method.is_a?(Proc)
         if method.arity == 1
           @wait_for = method
+          @wait_for_user_defined = true
         else
           raise ArgumentError, "Invalid wait_for method: #{method}"
         end
@@ -282,6 +286,7 @@ module Testcontainers
         kwargs = method[2] || {}
         if respond_to?(method_name)
           @wait_for = ->(container) { container.send(method_name, *args, **kwargs) }
+          @wait_for_user_defined = true
         else
           raise ArgumentError, "Invalid wait_for method: #{method_name}"
         end
@@ -289,11 +294,16 @@ module Testcontainers
         method_name = :"wait_for_#{method}"
         if respond_to?(method_name)
           @wait_for = ->(container) { container.send(method_name, *args, **kwargs) }
+          @wait_for_user_defined = true
         else
           raise ArgumentError, "Invalid wait_for method: #{method_name}"
         end
       end
       @wait_for
+    end
+
+    def wait_for_user_defined?
+      @wait_for_user_defined
     end
 
     # Set options for the container configuration using "with_" methods.
