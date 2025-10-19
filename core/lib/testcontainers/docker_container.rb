@@ -487,7 +487,18 @@ module Testcontainers
 
       connection = Docker::Connection.new(Docker.url, Docker.options)
 
-      Docker::Image.create({"fromImage" => @image}.merge(@image_create_options), connection)
+      image_options = {"fromImage" => @image}.merge(@image_create_options)
+      image_reference = (image_options["fromImage"] || image_options[:fromImage] || @image).to_s
+      tag_option = image_options["tag"] || image_options[:tag]
+      if tag_option && !image_reference.end_with?(":#{tag_option}")
+        image_reference = "#{image_reference}:#{tag_option}"
+      end
+
+      begin
+        Docker::Image.get(image_reference, {}, connection)
+      rescue Docker::Error::NotFoundError
+        Docker::Image.create(image_options, connection)
+      end
 
       @_container ||= Docker::Container.create(_container_create_options)
       @_container.start
