@@ -3,7 +3,7 @@ PATH
   specs:
     testcontainers-core (0.2.0)
       base64 (~> 0.3)
-      docker-api (~> 2.2)
+      docker-api (~> 2.4)
       java-properties (~> 0.3.0)
 
 PATH

@@ -3,7 +3,7 @@ PATH
   specs:
     testcontainers-core (0.2.0)
       base64 (~> 0.3)
-      docker-api (~> 2.2)
+      docker-api (~> 2.4)
       java-properties (~> 0.3.0)
 
 PATH
@@ -21,8 +21,8 @@ GEM
     bunny (2.20.3)
       amq-protocol (~> 2.3, >= 2.3.1)
       sorted_set (~> 1, >= 1.0.2)
-    docker-api (2.2.0)
-      excon (>= 0.47.0)
+    docker-api (2.4.0)
+      excon (>= 0.64.0)
       multi_json
     excon (0.99.0)
     java-properties (0.3.0)

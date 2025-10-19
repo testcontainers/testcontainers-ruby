@@ -3,7 +3,7 @@ PATH
   specs:
     testcontainers-core (0.2.0)
       base64 (~> 0.3)
-      docker-api (~> 2.2)
+      docker-api (~> 2.4)
       java-properties (~> 0.3.0)
 
 PATH
@@ -18,8 +18,8 @@ GEM
     ast (2.4.3)
     base64 (0.3.0)
     childprocess (4.1.0)
-    docker-api (2.2.0)
-      excon (>= 0.47.0)
+    docker-api (2.4.0)
+      excon (>= 0.64.0)
       multi_json
     excon (0.100.0)
     java-properties (0.3.0)
