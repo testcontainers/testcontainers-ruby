@@ -18,7 +18,7 @@ module Testcontainers
     # @return [RedisContainer] a new instance of RedisContainer
     def initialize(image = REDIS_DEFAULT_IMAGE, **kwargs)
       super
-      @wait_for ||= add_wait_for(:logs, /Ready to accept connections/)
+      add_wait_for(:logs, /Ready to accept connections/) unless wait_for_user_defined?
     end
 
     # Starts the container

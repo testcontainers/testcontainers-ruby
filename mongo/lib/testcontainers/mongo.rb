@@ -35,7 +35,7 @@ module Testcontainers
       @password = password || ENV.fetch("MONGO_PASSWORD", MONGO_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("MONGO_DATABASE", MONGO_DEFAULT_DATABASE)
       @healthcheck ||= add_healthcheck(_default_healthcheck_options)
-      @wait_for ||= add_wait_for(:healthcheck)
+      add_wait_for(:healthcheck) unless wait_for_user_defined?
     end
 
     # Starts the container

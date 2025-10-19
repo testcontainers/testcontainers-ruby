@@ -80,4 +80,18 @@ class PostgresContainerTest < TestcontainersTest
     client = PG.connect(host: @host, user: "test", password: "test", port: @port, dbname: "test")
     assert_equal({"number" => "1"}, client.exec("SELECT 1 AS number").first)
   end
+
+  def test_default_wait_for_is_healthcheck
+    expected = Testcontainers::PostgresContainer.new(wait_for: :healthcheck).wait_for
+    actual = Testcontainers::PostgresContainer.new.wait_for
+
+    assert_equal expected.source_location, actual.source_location
+  end
+
+  def test_default_wait_for_is_healthcheck_when_port_bindings_specified
+    expected = Testcontainers::PostgresContainer.new(wait_for: :healthcheck).wait_for
+    actual = Testcontainers::PostgresContainer.new(port_bindings: {5432 => 15432}).wait_for
+
+    assert_equal expected.source_location, actual.source_location
+  end
 end

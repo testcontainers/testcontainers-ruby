@@ -281,6 +281,25 @@ class DockerContainerTest < TestcontainersTest
     assert_kind_of(Proc, container.wait_for)
   end
 
+  def test_wait_for_default_from_port_bindings_is_not_user_defined
+    container = Testcontainers::DockerContainer.new("hello-world", port_bindings: {80 => 8080})
+
+    refute container.wait_for_user_defined?
+  end
+
+  def test_wait_for_option_marks_user_defined
+    container = Testcontainers::DockerContainer.new("hello-world", wait_for: [:logs, /Hello from Docker!/])
+
+    assert container.wait_for_user_defined?
+  end
+
+  def test_add_wait_for_healthcheck_marks_user_defined
+    container = Testcontainers::DockerContainer.new("hello-world")
+    container.add_wait_for(:healthcheck)
+
+    assert container.wait_for_user_defined?
+  end
+
   def test_it_adds_a_wait_for_with_proc
     container = Testcontainers::DockerContainer.new("hello-world")
     container.add_wait_for(proc { |c| sleep 1 })

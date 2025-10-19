@@ -36,7 +36,7 @@ module Testcontainers
       @password = password || ENV.fetch("POSTGRES_PASSWORD", POSTGRES_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("POSTGRES_DATABASE", POSTGRES_DEFAULT_DATABASE)
       @healthcheck ||= add_healthcheck(_default_healthcheck_options)
-      @wait_for ||= add_wait_for(:healthcheck)
+      add_wait_for(:healthcheck) unless wait_for_user_defined?
     end
 
     # Starts the container

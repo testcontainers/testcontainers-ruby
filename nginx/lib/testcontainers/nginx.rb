@@ -18,7 +18,7 @@ module Testcontainers
     # @return [NginxContainer] a new instance of NginxContainer
     def initialize(image = NGINX_DEFAULT_IMAGE, port: nil, **kwargs)
       super(image, **kwargs)
-      @wait_for ||= add_wait_for(:logs, /start worker process/)
+      add_wait_for(:logs, /start worker process/) unless wait_for_user_defined?
     end
 
     # Starts the container

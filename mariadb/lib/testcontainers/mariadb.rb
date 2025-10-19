@@ -36,7 +36,7 @@ module Testcontainers
       @password = password || ENV.fetch("MARIADB_PASSWORD", MARIADB_DEFAULT_PASSWORD)
       @database = database || ENV.fetch("MARIADB_DATABASE", MARIADB_DEFAULT_DATABASE)
       @healthcheck ||= add_healthcheck(_default_healthcheck_options)
-      @wait_for ||= add_wait_for(:healthcheck)
+      add_wait_for(:healthcheck) unless wait_for_user_defined?
     end
 
     # Starts the container
