@@ -8,6 +8,7 @@ class TestcontainersTest < Minitest::Test
   end
 
   def test_that_it_sets_user_agent_header
+    Testcontainers::DockerClient.configure
     assert_equal "tc-ruby/#{::Testcontainers::VERSION}", Docker.options[:headers]["User-Agent"]
   end
 end

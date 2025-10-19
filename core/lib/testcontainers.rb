@@ -4,6 +4,8 @@ require "docker"
 require "logger"
 require "open3"
 require "uri"
+require "testcontainers/docker_client"
+require "testcontainers/network"
 require "testcontainers/docker_container"
 require_relative "testcontainers/version"
 
@@ -31,9 +33,4 @@ module Testcontainers
       @logger ||= Logger.new($stdout, level: :info)
     end
   end
-
-  # Configure Docker API with custom User-Agent
-  Docker.options ||= {}
-  Docker.options[:headers] ||= {}
-  Docker.options[:headers]["User-Agent"] = "tc-ruby/#{VERSION}"
 end

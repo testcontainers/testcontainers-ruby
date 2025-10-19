@@ -78,6 +78,61 @@ class DockerContainerTest < TestcontainersTest
     end
   end
 
+  def test_it_attaches_to_custom_network_with_aliases
+    network = Testcontainers::Network.new_network
+    container = Testcontainers::DockerContainer.new("alpine:latest", command: %w[sleep 60])
+      .with_network(network, aliases: ["web"])
+
+    container.start
+
+    network_info = container.info.dig("NetworkSettings", "Networks", network.name)
+    assert network_info
+    assert_includes network_info["Aliases"], "web"
+    assert_equal network.name, container.info.dig("HostConfig", "NetworkMode")
+  ensure
+    container&.stop! if container&.running?
+    container&.remove if container&.exists?
+    network&.force_close
+  end
+
+  def test_it_applies_pending_aliases_before_network_assignment
+    network = Testcontainers::Network.new_network
+    container = Testcontainers::DockerContainer.new("alpine:latest", command: %w[sleep 60])
+    container.with_network_aliases("app")
+    container.with_network(network)
+
+    container.start
+
+    network_info = container.info.dig("NetworkSettings", "Networks", network.name)
+    assert_includes network_info["Aliases"], "app"
+  ensure
+    container&.stop! if container&.running?
+    container&.remove if container&.exists?
+    network&.force_close
+  end
+
+  def test_it_attaches_to_multiple_networks
+    primary_network = Testcontainers::Network.new_network
+    secondary_network = Testcontainers::Network.new_network
+    container = Testcontainers::DockerContainer
+      .new("alpine:latest", command: %w[sleep 60])
+      .with_network(primary_network, aliases: ["primary"])
+      .with_network(secondary_network, aliases: ["secondary"])
+
+    container.start
+
+    networks = container.info.fetch("NetworkSettings").fetch("Networks")
+    assert_includes networks.keys, primary_network.name
+    assert_includes networks.keys, secondary_network.name
+    assert_includes networks[primary_network.name]["Aliases"], "primary"
+    assert_includes networks[secondary_network.name]["Aliases"], "secondary"
+  ensure
+    container&.stop! if container&.running?
+    container&.remove if container&.exists?
+    primary_network&.force_close
+    secondary_network&.force_close
+  end
+
   def test_it_returns_the_container_image
     assert_equal "hello-world", @container.image
   end
