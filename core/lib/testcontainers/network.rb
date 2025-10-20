@@ -15,6 +15,7 @@ module Testcontainers
   class Network
     extend Forwardable
     include Enumerable
+
     DEFAULT_DRIVER = "bridge"
     SHARED_NAME = "testcontainers-shared-network"
 
@@ -155,14 +156,12 @@ module Testcontainers
 
       @mutex.synchronize do
         @docker_network&.tap do |net|
-          begin
-            removal_method = force ? :delete : :remove
-            net.public_send(removal_method)
-          rescue Docker::Error::NotFoundError
-            # Swallow missing network errors so cleanup stays idempotent
-          rescue Docker::Error::ConflictError, Excon::Error::Forbidden => e
-            raise NetworkInUseError, "Network '#{@name}' is in use: #{e.message}"
-          end
+          removal_method = force ? :delete : :remove
+          net.public_send(removal_method)
+        rescue Docker::Error::NotFoundError
+          # Swallow missing network errors so cleanup stays idempotent
+        rescue Docker::Error::ConflictError, Excon::Error::Forbidden => e
+          raise NetworkInUseError, "Network '#{@name}' is in use: #{e.message}"
         end
       ensure
         @docker_network = nil
