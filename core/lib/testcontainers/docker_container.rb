@@ -818,7 +818,8 @@ module Testcontainers
     # @return [String] The environment variable's value.
     # @return [nil] If the environment variable does not exist.
     def get_env(key)
-      env_entry = env.find { |entry| entry.start_with?("#{key}=") }
+      env_list = env || []
+      env_entry = env_list.find { |entry| entry.start_with?("#{key}=") }
       env_entry&.split("=")&.last
     end
 

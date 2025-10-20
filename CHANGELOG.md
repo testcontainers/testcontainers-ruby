@@ -7,6 +7,7 @@ TestContainers is composed of modules for common databases and services. This ch
 - [ComposeContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/compose/CHANGELOG.md)
 
 - [ElasticsearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/elasticsearch/CHANGELOG.md)
+- [OpensearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/opensearch/CHANGELOG.md)
 
 - [MariadbContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mariadb/CHANGELOG.md)
 
@@ -32,4 +33,3 @@ TestContainers is composed of modules for common databases and services. This ch
 
 - ComposeContainer. See the [testcontainers-compose readme](https://github.com/testcontainers/testcontainers-ruby/tree/main/compose/README.md) for more information.
 - SeleniumContainer. See the [testcontainers-selenium readme](https://github.com/testcontainers/testcontainers-ruby/tree/main/selenium/README.md) for more information.
-
