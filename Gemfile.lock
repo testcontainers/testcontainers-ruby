@@ -25,6 +25,12 @@ PATH
       testcontainers-core (~> 0.1)
 
 PATH
+  remote: kafka
+  specs:
+    testcontainers-kafka (0.1.0)
+      testcontainers-core (~> 0.1)
+
+PATH
   remote: mariadb
   specs:
     testcontainers-mariadb (0.2.0)
@@ -216,6 +222,7 @@ DEPENDENCIES
   testcontainers-compose!
   testcontainers-core!
   testcontainers-elasticsearch!
+  testcontainers-kafka!
   testcontainers-mariadb!
   testcontainers-mongo!
   testcontainers-mysql!

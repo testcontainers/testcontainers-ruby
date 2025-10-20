@@ -8,6 +8,7 @@ TestContainers is composed of modules for common databases and services. This ch
 
 - [ElasticsearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/elasticsearch/CHANGELOG.md)
 - [OpensearchContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/opensearch/CHANGELOG.md)
+- [KafkaContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/kafka/CHANGELOG.md)
 
 - [MariadbContainer](https://github.com/testcontainers/testcontainers-ruby/tree/main/mariadb/CHANGELOG.md)
 
