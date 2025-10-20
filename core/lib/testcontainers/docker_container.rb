@@ -1271,7 +1271,7 @@ module Testcontainers
     def resolve_network(network)
       case network
       when Testcontainers::Network
-        network.create
+        network.create!
         [network.name, network]
       when Docker::Network
         info = network.info || {}

@@ -99,4 +99,11 @@ redis = Testcontainers::DockerContainer.new("redis:6.2-alpine").with_network(net
 nginx = Testcontainers::DockerContainer.new("nginx:alpine").with_network(network)
 ```
 
-`Testcontainers::Network::SHARED` is a singleton that remains available for the lifetime of your test suite, and the library cleans it up automatically when the process exits. You can still create additional ad-hoc networks with `Testcontainers::Network.new_network` when you need isolated environments.
+`Testcontainers::Network.shared` (or `Testcontainers::Network::SHARED`) returns a singleton shared network that remains available for the lifetime of your test suite, and the library cleans it up automatically when the process exits. You can create additional ad-hoc networks with `Testcontainers::Network.create` when you need isolated environments. For automatic cleanup, use the block form:
+
+```ruby
+Testcontainers::Network.create(name: "test-net") do |network|
+  container.with_network(network).start
+  # Run tests...
+end # network automatically removed
+```

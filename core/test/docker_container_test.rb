@@ -79,7 +79,7 @@ class DockerContainerTest < TestcontainersTest
   end
 
   def test_it_attaches_to_custom_network_with_aliases
-    network = Testcontainers::Network.new_network
+    network = Testcontainers::Network.create
     container = Testcontainers::DockerContainer.new("alpine:latest", command: %w[sleep 60])
       .with_network(network, aliases: ["web"])
 
@@ -96,7 +96,7 @@ class DockerContainerTest < TestcontainersTest
   end
 
   def test_it_applies_pending_aliases_before_network_assignment
-    network = Testcontainers::Network.new_network
+    network = Testcontainers::Network.create
     container = Testcontainers::DockerContainer.new("alpine:latest", command: %w[sleep 60])
     container.with_network_aliases("app")
     container.with_network(network)
@@ -112,8 +112,8 @@ class DockerContainerTest < TestcontainersTest
   end
 
   def test_it_attaches_to_multiple_networks
-    primary_network = Testcontainers::Network.new_network
-    secondary_network = Testcontainers::Network.new_network
+    primary_network = Testcontainers::Network.create
+    secondary_network = Testcontainers::Network.create
     container = Testcontainers::DockerContainer
       .new("alpine:latest", command: %w[sleep 60])
       .with_network(primary_network, aliases: ["primary"])
