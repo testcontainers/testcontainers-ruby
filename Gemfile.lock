@@ -5,6 +5,12 @@ PATH
       testcontainers-core (= 0.2.0)
 
 PATH
+  remote: clickhouse
+  specs:
+    testcontainers-clickhouse (0.1.0)
+      testcontainers-core (~> 0.1)
+
+PATH
   remote: compose
   specs:
     testcontainers-compose (0.2.0)
@@ -219,6 +225,7 @@ DEPENDENCIES
   selenium-webdriver (~> 4.1.0)
   standard (~> 1.3)
   testcontainers!
+  testcontainers-clickhouse!
   testcontainers-compose!
   testcontainers-core!
   testcontainers-elasticsearch!
