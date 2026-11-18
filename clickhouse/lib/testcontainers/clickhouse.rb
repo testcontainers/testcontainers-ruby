@@ -38,7 +38,7 @@ module Testcontainers
     #  @param kwargs [Hash] the options to pass to the container. See {DockerContainer#initialize}
     #  @return [ClickhouseContainer] a new instance of ClickhouseContainer
     def initialize(image = CLICKHOUSE_DEFAULT_IMAGE, username: nil, password: nil, database: nil, **kwargs)
-      super(image, wait_for: WAIT_FOR_PROC, exposed_ports: [CLICKHOUSE_DEFAULT_PORT, CLICKHOUSE_DEFAULT_HTTP_PORT], **kwargs)
+      super(image, wait_for: WAIT_FOR_PROC, **kwargs)
       @username = username || ENV.fetch("CLICKHOUSE_USER", CLICKHOUSE_DEFAULT_USER)
       @password = password || ENV.fetch("CLICKHOUSE_PASSWORD", CLICKHOUSE_DEFAULT_PASS)
       @database = database || ENV.fetch("CLICKHOUSE_DB", CLICKHOUSE_DB)
@@ -48,6 +48,7 @@ module Testcontainers
     #
     # @return [ClickhouseContainer] self
     def start
+      with_exposed_ports(port, http_port)
       _configure
       super
     end
