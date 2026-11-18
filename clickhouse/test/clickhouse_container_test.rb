@@ -50,6 +50,18 @@ class ClickhouseContainerTest < TestcontainersTest
     assert @container.mapped_port(9000)
   end
 
+  def test_it_keeps_default_ports_when_custom_exposed_ports_are_given
+    container = Testcontainers::ClickhouseContainer.new(exposed_ports: [8443])
+    container.start
+
+    assert container.mapped_port(8443)
+    assert container.mapped_port(container.port)
+    assert container.mapped_port(container.http_port)
+  ensure
+    container&.stop if container&.running?
+    container&.remove if container&.exists?
+  end
+
   def test_it_returns_the_default_clickhouse_url
     assert_equal "clickhouse://default:password@#{@host}:#{@port}/default", @container.clickhouse_url
   end
